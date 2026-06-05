@@ -1,64 +1,37 @@
-import Image from "next/image";
+import { LogCard } from "@/components/log_card";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div>
+      <main className="max-w-2xl mx-auto mt-10 flex flex-col gap-6">
+        <LogCard
+          title="Installing VS Code Extensions in Antigravity IDE"
+          author="zephyr"
+          date="Mar 2026"
+          summary="Antigravity uses the Open VSX registry, which has a different selection than the VS Code marketplace. This guide covers how to find, download, and manually install .vsix files to get the extensions you want."
+          href="#"
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+        <LogCard
+          title="Request Validation Middleware in Express with Zod"
+          author="maddox"
+          date="Jan 2026"
+          summary="Build a reusable validation middleware that parses and type-narrows req.body using Zod schemas. Covers error formatting, 422 responses, and keeping route handlers clean."
+          href="#"
+        />
+        <LogCard
+          title="Bluetooth Device Not Connecting on Windows? Here's How to Fix It"
+          author="rinna"
+          date="Feb 2026"
+          summary="A step-by-step guide to getting your Bluetooth device working on Windows. Covers driver setup and the Bluetooth support service."
+          href="#"
+        />
+        <LogCard
+          title="The Python Toolchain Got a Lot Simpler With uv"
+          author="callum"
+          date="Apr 2026"
+          summary="uv handles packages, virtual environments, Python versions, and project management in one fast tool. A practical guide to getting started and what you can drop from your workflow."
+          href="#"
+        />
       </main>
     </div>
   );
