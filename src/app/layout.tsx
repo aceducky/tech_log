@@ -4,7 +4,7 @@ import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { cn } from "@/lib/utils";
 
-const roboto = JetBrains_Mono({subsets:['latin'],variable:'--font-sans'});
+const roboto = JetBrains_Mono({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
