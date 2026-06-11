@@ -16,13 +16,7 @@ interface LogCardProps {
   href: string;
 }
 
-export function LogCard({
-  title,
-  author,
-  date,
-  summary,
-  href,
-}: LogCardProps) {
+export function LogCard({ title, author, date, summary, href }: LogCardProps) {
   return (
     <Card>
       <CardHeader className="pb-2">
@@ -40,7 +34,7 @@ export function LogCard({
           href={href}
           className="text-blue-600 hover:underline text-sm font-medium w-fit"
         >
-          Read article &rarr;
+          Read log &rarr;
         </Link>
       </CardFooter>
     </Card>
