@@ -1,39 +1,126 @@
 "use server";
 
-import { redirect } from "next/navigation";
-import type { Log } from "@/types/api";
+import type { User } from "better-auth";
+import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
+import { db } from "@/db";
+import {
+  createLogFormSchema,
+  editLogFormSchema,
+  type Log,
+  logIdSchema,
+  logTable,
+} from "@/db/schemas/log-schema";
+import { requireUserServer } from "@/lib/auth/require_user_server";
+import type { Result } from "@/lib/result";
+import { Err, Ok, ValidationErr } from "@/lib/result";
 
-export type CreateLogInput = Omit<Log, "id" | "createdAt" | "authorId">;
+export async function createLog(data: unknown): Promise<Result<Log["id"]>> {
+  const { user } = await requireUserServer();
 
-export type UpdateLogInput = Omit<Partial<CreateLogInput>, "authorName">;
+  const validated = createLogFormSchema.safeParse(data);
 
-export async function createLog(data: CreateLogInput) {
-  console.log("Created log", data);
-  return { success: true };
-}
-
-export async function updateLog(id: string, data: UpdateLogInput) {
-  console.log(`Update log with ${id}`, data);
-  return {
-    success: true,
-    message: `Log with ${id} updated`,
-  };
-}
-
-export async function deleteLog(id: string) {
-  console.log("Deleted log", id);
-  return {
-    success: true,
-    message: `Log with ${id} deleted`,
-  };
-}
-
-export async function deleteLogForm(formData: FormData): Promise<void> {
-  const id = formData.get("id");
-  if (!id) {
-    throw new Error("Missing log id");
+  if (!validated.success) {
+    return ValidationErr({ zodErr: validated.error });
   }
 
-  await deleteLog(String(id));
-  redirect("/");
+  try {
+    const [res] = await db
+      .insert(logTable)
+      .values({ ...validated.data, authorId: user.id })
+      .returning({ id: logTable.id });
+    revalidatePath("/");
+    return Ok({ message: "Created log successfully", data: res.id });
+  } catch (err) {
+    console.error(err);
+    return Err({ message: "Failed to create log" });
+  }
+}
+
+export async function hasOwnership(
+  incomingUserId: User["id"],
+  incomingLogId: Log["id"],
+): Promise<Result<{ isOwner: boolean }>> {
+  try {
+    const [row] = await db
+      .select({ authorId: logTable.authorId })
+      .from(logTable)
+      .where(eq(logTable.id, incomingLogId));
+
+    if (!row) {
+      return Err({ message: "Log not found" });
+    }
+
+    return Ok({
+      data: { isOwner: row.authorId === incomingUserId },
+    });
+  } catch (err) {
+    console.error(err);
+    return Err({ message: "Couldn't fetch log details" });
+  }
+}
+
+export async function updateLog(data: unknown): Promise<Result> {
+  const { user } = await requireUserServer();
+
+  const validated = editLogFormSchema.safeParse(data);
+  if (!validated.success) {
+    return ValidationErr({ zodErr: validated.error });
+  }
+
+  const hasOwnershipRes = await hasOwnership(user.id, validated.data.id);
+  if (hasOwnershipRes.error) {
+    return hasOwnershipRes;
+  }
+
+  if (!hasOwnershipRes.data?.isOwner) {
+    return Err({ message: "Not authorized to update the log" });
+  }
+
+  const { id, ...update } = validated.data;
+
+  if (Object.keys(update).length === 0) {
+    return Ok({ message: "No changes to update" });
+  }
+
+  try {
+    await db
+      .update(logTable)
+      .set(update)
+      .where(eq(logTable.id, validated.data.id));
+    revalidatePath("/");
+    revalidatePath(`/logs/${validated.data.id}`);
+    return Ok({ message: "Log is updated" });
+  } catch (err) {
+    console.error(err);
+    return Err({ message: "Couldn't update log" });
+  }
+}
+
+export async function deleteLog(logId: unknown): Promise<Result> {
+  const { user } = await requireUserServer();
+  const validatedId = logIdSchema.safeParse(logId);
+
+  if (!validatedId.success) {
+    return ValidationErr({ message: "Invalid log id" });
+  }
+
+  const hasOwnershipRes = await hasOwnership(user.id, validatedId.data);
+  if (hasOwnershipRes.error) {
+    return hasOwnershipRes;
+  }
+
+  if (!hasOwnershipRes.data?.isOwner) {
+    return Err({ message: "Not authorized to delete" });
+  }
+
+  try {
+    await db.delete(logTable).where(eq(logTable.id, validatedId.data));
+    revalidatePath("/");
+    revalidatePath(`/logs/${validatedId.data}`);
+    return Ok({ message: "Log is deleted" });
+  } catch (err) {
+    console.error(err);
+    return Err({ message: "Couldn't delete log" });
+  }
 }
