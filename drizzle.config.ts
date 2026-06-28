@@ -1,10 +1,15 @@
 import { config } from "dotenv";
 import { defineConfig } from "drizzle-kit";
-import { envSchema } from "@/config/env/schema";
+import { z } from "zod";
 
 config({ path: ".env.local" });
-const dbEnvSchema = envSchema.pick({ DATABASE_URL: true });
-const dbEnv = dbEnvSchema.parse(process.env);
+
+const dbEnv = z
+  .object({
+    DATABASE_URL: z.url(),
+  })
+  .parse(process.env);
+
 export default defineConfig({
   schema: "./src/db/schemas/*.ts",
   out: "./migrations",
