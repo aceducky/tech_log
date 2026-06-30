@@ -90,7 +90,6 @@ export default function CreateLogForm() {
   ) {
     onChange(undefined);
     resetDropzone();
-    form.clearErrors("coverImgUrl");
   }
 
   return (
@@ -192,8 +191,6 @@ export default function CreateLogForm() {
                             endpoint="coverImgUploader"
                             disabled={form.formState.isSubmitting}
                             onChange={(files) => {
-                              form.clearErrors("coverImgUrl");
-
                               const file = files[0];
                               if (!file) {
                                 replaceCoverPreviewUrl(undefined);

@@ -1,0 +1,51 @@
+import { Edit, Trash } from "lucide-react";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { deleteLog } from "@/app/actions/logs";
+import type { Log } from "@/db/schemas/log-schema";
+import { cn } from "@/lib/utils";
+import { ActionButton } from "../ui/action-button";
+import { Button } from "../ui/button";
+
+type OwnerVisibleActionsProps = {
+  isOwner: boolean;
+  logId: Log["id"];
+  className?: string;
+};
+
+export default function LogOwnerVisibleActions({
+  isOwner,
+  logId,
+  className,
+}: OwnerVisibleActionsProps) {
+  if (!isOwner) return null;
+
+  return (
+    <div className={cn("flex items-center gap-2", className)}>
+      <Link href={`/logs/edit/${logId}`}>
+        <Button variant="outline">
+          <Edit className="mr-2 h-4 w-4" />
+          Edit Log
+        </Button>
+      </Link>
+
+      <ActionButton
+        variant="destructive"
+        className="ml-2"
+        requireAreYouSure
+        areYouSureDescription="This will permanently delete this log. This action cannot be undone."
+        action={async () => {
+          "use server";
+          const res = await deleteLog(logId);
+
+          if (!res.error) redirect("/");
+
+          return res;
+        }}
+      >
+        <Trash className="mr-2 h-4 w-4" />
+        Delete
+      </ActionButton>
+    </div>
+  );
+}

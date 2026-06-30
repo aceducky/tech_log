@@ -8,7 +8,7 @@ import * as schema from "../../db/schemas/auth-schema";
 export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg", schema }),
   baseURL: {
-    allowedHosts: ["localhost:3000", "techloggers.vercel.app", "*.vercel.app"],
+    allowedHosts: ["localhost:3000", "techloggers.vercel.app"],
     fallback: env.BETTER_AUTH_URL,
   },
   emailAndPassword: { enabled: false },

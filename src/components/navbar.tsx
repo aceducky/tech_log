@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { auth } from "@/lib/auth";
 import UserButton from "./auth/user_button";
+import WriteLogButton from "./log/write_log_button";
 
 export async function Navbar() {
   const session = await auth.api.getSession({
@@ -27,10 +28,14 @@ export async function Navbar() {
           <NavigationMenuList className="flex items-center gap-2">
             <NavigationMenuItem>
               {session?.user ? (
-                <UserButton
-                  userImage={session.user.image}
-                  userImageFallback={session.user.name?.[0]?.toLocaleUpperCase()}
-                />
+                <div className="flex items-center gap-3">
+                  <WriteLogButton />
+                  <UserButton
+                    userImage={session.user.image}
+                    userImageFallback={session.user.name?.[0]?.toLocaleUpperCase()}
+                    username={session.user.username}
+                  />
+                </div>
               ) : (
                 <Button asChild className="group">
                   <Link href="/sign-in">

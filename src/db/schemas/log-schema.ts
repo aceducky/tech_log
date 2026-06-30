@@ -13,7 +13,7 @@ export const logTable = pgTable("log", {
   title: text("title").notNull(),
   content: text("content").notNull(),
   coverImgUrl: text("image_url"),
-  count: integer("count"),
+  pageViews: integer("pageViews"),
   ...timestamps,
 });
 

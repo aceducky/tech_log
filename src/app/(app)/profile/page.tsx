@@ -6,10 +6,10 @@ import SessionManagement from "@/components/auth/sessions_management";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { requireUserServer } from "@/lib/auth/require_user_server";
+import { requireSessionServer } from "@/lib/auth/require_session_server";
 
 export default async function ProfilePage() {
-  const { user, session } = await requireUserServer();
+  const { user, session } = await requireSessionServer();
 
   return (
     <div className="px-4 mb-10">

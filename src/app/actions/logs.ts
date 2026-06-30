@@ -3,6 +3,7 @@
 import type { User } from "better-auth";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { redis } from "@/cache";
 import { db } from "@/db";
 import {
   createLogFormSchema,
@@ -11,12 +12,13 @@ import {
   logIdSchema,
   logTable,
 } from "@/db/schemas/log-schema";
-import { requireUserServer } from "@/lib/auth/require_user_server";
+import { requireSessionServer } from "@/lib/auth/require_session_server";
+import { GET_LOGS_KEY } from "@/lib/dal";
 import type { Result } from "@/lib/result";
 import { Err, Ok, ValidationErr } from "@/lib/result";
 
 export async function createLog(data: unknown): Promise<Result<Log["id"]>> {
-  const { user } = await requireUserServer();
+  const { user } = await requireSessionServer();
 
   const validated = createLogFormSchema.safeParse(data);
 
@@ -30,6 +32,9 @@ export async function createLog(data: unknown): Promise<Result<Log["id"]>> {
       .values({ ...validated.data, authorId: user.id })
       .returning({ id: logTable.id });
     revalidatePath("/");
+
+    redis.del(GET_LOGS_KEY);
+
     return Ok({ message: "Created log successfully", data: res.id });
   } catch (err) {
     console.error(err);
@@ -61,7 +66,7 @@ export async function hasOwnership(
 }
 
 export async function updateLog(data: unknown): Promise<Result> {
-  const { user } = await requireUserServer();
+  const { user } = await requireSessionServer();
 
   const validated = editLogFormSchema.safeParse(data);
   if (!validated.success) {
@@ -98,7 +103,7 @@ export async function updateLog(data: unknown): Promise<Result> {
 }
 
 export async function deleteLog(logId: unknown): Promise<Result> {
-  const { user } = await requireUserServer();
+  const { user } = await requireSessionServer();
   const validatedId = logIdSchema.safeParse(logId);
 
   if (!validatedId.success) {

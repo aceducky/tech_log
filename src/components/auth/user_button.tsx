@@ -1,7 +1,7 @@
 "use client";
 
 import type { User } from "better-auth";
-import { LogOutIcon, UserIcon } from "lucide-react";
+import { BookIcon, LogOutIcon, UserIcon } from "lucide-react";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -21,6 +21,7 @@ import {
 export type UserButtonProps = {
   userImage: User["image"];
   userImageFallback: string;
+  username: string;
 };
 
 export default function UserButton(props: UserButtonProps) {
@@ -58,6 +59,12 @@ export default function UserButton(props: UserButtonProps) {
             <Link href="/profile">
               <UserIcon />
               Profile
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href={`/user/${props.username}`}>
+              <BookIcon />
+              My Logs
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
