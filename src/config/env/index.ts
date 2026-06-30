@@ -8,6 +8,8 @@ export const env = createEnv({
     DATABASE_URL: z.url(),
     UPLOADTHING_TOKEN: z.string().min(1),
     BETTER_AUTH_URL: z.url(),
+    RESEND_API_KEY: z.string().min(1),
+    DEMO_RECEIVER_EMAIL: z.email(),
   },
   client: {
     NEXT_PUBLIC_BETTER_AUTH_URL: z.url(),
@@ -18,6 +20,8 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     UPLOADTHING_TOKEN: process.env.UPLOADTHING_TOKEN,
     BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
+    DEMO_RECEIVER_EMAIL: process.env.DEMO_RECEIVER_EMAIL,
     NEXT_PUBLIC_BETTER_AUTH_URL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL,
   },
 });

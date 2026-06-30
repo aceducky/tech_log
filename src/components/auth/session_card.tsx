@@ -5,6 +5,7 @@ import { Monitor, Smartphone, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { UAParser } from "ua-parser-js";
 import { authClient } from "@/lib/auth/auth-client";
+import { sessionDateFormat } from "@/lib/utils";
 import { Badge } from "../ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { BetterAuthActionButton } from "./better_auth_action_button";
@@ -24,13 +25,6 @@ function getBrowserInformation(userAgentInfo: UAParser.IResult | null) {
   if (userAgentInfo.os.name == null) return userAgentInfo.browser.name;
 
   return `${userAgentInfo.browser.name}, ${userAgentInfo.os.name}`;
-}
-
-function formatDate(date: Date) {
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(date);
 }
 
 export default function SessionCard({
@@ -62,10 +56,10 @@ export default function SessionCard({
             )}
             <div className="space-y-0.5">
               <p className="text-xs text-muted-foreground">
-                Created: {formatDate(session.createdAt)}
+                Created: {sessionDateFormat(session.createdAt)}
               </p>
               <p className="text-xs text-muted-foreground">
-                Expires: {formatDate(session.expiresAt)}
+                Expires: {sessionDateFormat(session.expiresAt)}
               </p>
             </div>
           </div>

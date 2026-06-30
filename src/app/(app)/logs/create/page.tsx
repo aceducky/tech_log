@@ -1,8 +1,8 @@
 import CreateLogForm from "@/components/log/create_log_form";
-import { requireUserServer } from "@/lib/auth/require_user_server";
+import { requireSessionServer } from "@/lib/auth/require_session_server";
 
 export default async function Page() {
-  await requireUserServer();
+  await requireSessionServer();
   return (
     <div className="p-4">
       <CreateLogForm />

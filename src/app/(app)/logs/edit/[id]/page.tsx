@@ -3,11 +3,11 @@ import { notFound } from "next/navigation";
 import EditLogForm from "@/components/log/edit_log_form";
 import { db } from "@/db";
 import { logIdSchema, logTable } from "@/db/schemas/log-schema";
-import { requireUserServer } from "@/lib/auth/require_user_server";
+import { requireSessionServer } from "@/lib/auth/require_session_server";
 import type { LogIdParams } from "../../types";
 
 export default async function Page({ params }: LogIdParams) {
-  const { user } = await requireUserServer();
+  const { user } = await requireSessionServer();
   const { id } = await params;
   const res = logIdSchema.safeParse(id);
   if (!res.success) {

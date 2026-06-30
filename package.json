@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "email:dev": "email dev --dir src/email/templates"
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "^1.6.20",
@@ -21,6 +22,7 @@
     "@t3-oss/env-nextjs": "^0.13.11",
     "@uiw/react-md-editor": "^4.1.1",
     "@uploadthing/react": "^7.3.3",
+    "@upstash/redis": "^1.38.0",
     "better-auth": "^1.6.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -34,10 +36,12 @@
     "radix-ui": "^1.6.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "react-email": "6.6.5",
     "react-hook-form": "^7.80.0",
     "react-markdown": "^10.1.0",
     "rehype-sanitize": "^6.0.0",
     "remark-gfm": "^4.0.1",
+    "resend": "^6.16.0",
     "shadcn": "^4.11.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.6.0",
@@ -48,6 +52,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.16",
+    "@react-email/ui": "6.6.5",
     "@tailwindcss/postcss": "^4.3.1",
     "@types/node": "^20.19.43",
     "@types/pg": "^8.20.0",

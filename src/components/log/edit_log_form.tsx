@@ -102,7 +102,7 @@ export default function EditLogForm({
       return;
     }
     if (res.message) toast.success(res.message);
-    router.push("/");
+    router.push(`/logs/${id}`);
   }
 
   return (
