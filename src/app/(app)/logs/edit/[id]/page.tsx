@@ -1,12 +1,13 @@
 import { and, eq, sql } from "drizzle-orm";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import EditLogForm from "@/components/log/edit_log_form";
 import { db } from "@/db";
 import { logIdSchema, logTable } from "@/db/schemas/log-schema";
 import { requireSessionServer } from "@/lib/auth/require_session_server";
 import type { LogIdParams } from "../../types";
 
-export default async function Page({ params }: LogIdParams) {
+async function EditLogContent({ params }: LogIdParams) {
   const { user } = await requireSessionServer();
   const { id } = await params;
   const res = logIdSchema.safeParse(id);
@@ -43,5 +44,19 @@ export default async function Page({ params }: LogIdParams) {
       content={log.content}
       coverImgUrl={log.coverImgUrl}
     />
+  );
+}
+
+export default async function Page({ params }: LogIdParams) {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex flex-col items-center gap-4 py-12 text-muted-foreground">
+          Loading editor...
+        </div>
+      }
+    >
+      <EditLogContent params={params} />
+    </Suspense>
   );
 }

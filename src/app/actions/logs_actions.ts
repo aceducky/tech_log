@@ -1,9 +1,7 @@
 "use server";
 
-import type { User } from "better-auth";
 import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
-import { redis } from "@/cache";
+import { updateTag } from "next/cache";
 import { db } from "@/db";
 import {
   createLogFormSchema,
@@ -13,7 +11,12 @@ import {
   logTable,
 } from "@/db/schemas/log-schema";
 import { requireSessionServer } from "@/lib/auth/require_session_server";
-import { GET_LOGS_KEY } from "@/lib/dal";
+import {
+  GET_LOG_BY_ID_CACHE_TAG,
+  GET_LOGS_BY_USERNAME_CACHE_TAG,
+  GET_LOGS_CACHE_TAG,
+  hasOwnership,
+} from "@/lib/dal/logs_dal";
 import type { Result } from "@/lib/result";
 import { Err, Ok, ValidationErr } from "@/lib/result";
 
@@ -31,37 +34,14 @@ export async function createLog(data: unknown): Promise<Result<Log["id"]>> {
       .insert(logTable)
       .values({ ...validated.data, authorId: user.id })
       .returning({ id: logTable.id });
-    revalidatePath("/");
 
-    redis.del(GET_LOGS_KEY);
+    updateTag(GET_LOGS_CACHE_TAG);
+    updateTag(`${GET_LOGS_BY_USERNAME_CACHE_TAG}-${user.username}`);
 
     return Ok({ message: "Created log successfully", data: res.id });
   } catch (err) {
     console.error(err);
     return Err({ message: "Failed to create log" });
-  }
-}
-
-export async function hasOwnership(
-  incomingUserId: User["id"],
-  incomingLogId: Log["id"],
-): Promise<Result<{ isOwner: boolean }>> {
-  try {
-    const [row] = await db
-      .select({ authorId: logTable.authorId })
-      .from(logTable)
-      .where(eq(logTable.id, incomingLogId));
-
-    if (!row) {
-      return Err({ message: "Log not found" });
-    }
-
-    return Ok({
-      data: { isOwner: row.authorId === incomingUserId },
-    });
-  } catch (err) {
-    console.error(err);
-    return Err({ message: "Couldn't fetch log details" });
   }
 }
 
@@ -93,8 +73,11 @@ export async function updateLog(data: unknown): Promise<Result> {
       .update(logTable)
       .set(update)
       .where(eq(logTable.id, validated.data.id));
-    revalidatePath("/");
-    revalidatePath(`/logs/${validated.data.id}`);
+
+    updateTag(GET_LOGS_CACHE_TAG);
+    updateTag(`${GET_LOG_BY_ID_CACHE_TAG}-${validated.data.id}`);
+    updateTag(`${GET_LOGS_BY_USERNAME_CACHE_TAG}-${user.username}`);
+
     return Ok({ message: "Log is updated" });
   } catch (err) {
     console.error(err);
@@ -121,8 +104,11 @@ export async function deleteLog(logId: unknown): Promise<Result> {
 
   try {
     await db.delete(logTable).where(eq(logTable.id, validatedId.data));
-    revalidatePath("/");
-    revalidatePath(`/logs/${validatedId.data}`);
+
+    updateTag(GET_LOGS_CACHE_TAG);
+    updateTag(`${GET_LOG_BY_ID_CACHE_TAG}-${validatedId.data}`);
+    updateTag(`${GET_LOGS_BY_USERNAME_CACHE_TAG}-${user.username}`);
+
     return Ok({ message: "Log is deleted" });
   } catch (err) {
     console.error(err);

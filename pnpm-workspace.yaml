@@ -8,8 +8,8 @@ ignoredBuiltDependencies:
   - unrs-resolver
 minimumReleaseAgeExclude:
   - postcss@8.5.10
-  - esbuild@0.24.3
-  - esbuild@0.28.1
+  - esbuild@0.24.3 || 0.28.1
+  - effect@3.20.0
 overrides:
-  esbuild: 0.28.0
+  effect@<3.20.0: ^3.20.0
   postcss@<8.5.10: ^8.5.10

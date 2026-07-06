@@ -1,6 +1,7 @@
 import { ArrowRightIcon } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
+import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -10,6 +11,7 @@ import {
 import { auth } from "@/lib/auth";
 import UserButton from "./auth/user_button";
 import WriteLogButton from "./log/write_log_button";
+import { NavbarSearch } from "./navbar_search";
 
 export async function Navbar() {
   const session = await auth.api.getSession({
@@ -17,37 +19,37 @@ export async function Navbar() {
   });
 
   return (
-    <nav className="w-full border-b bg-secondary/30 backdrop-blur-xs sticky top-0 z-50">
-      <div className="mx-auto flex h-16 items-center justify-between px-2 w-9/10">
-        <div className="flex items-center gap-2">
-          <Link href="/" className="text-2xl font-bold tracking-tight">
-            TechLog
-          </Link>
-        </div>
-        <NavigationMenu>
-          <NavigationMenuList className="flex items-center gap-2">
-            <NavigationMenuItem>
-              {session?.user ? (
-                <div className="flex items-center gap-3">
-                  <WriteLogButton />
-                  <UserButton
-                    userImage={session.user.image}
-                    userImageFallback={session.user.name?.[0]?.toLocaleUpperCase()}
-                    username={session.user.username}
-                  />
-                </div>
-              ) : (
-                <Button asChild className="group">
-                  <Link href="/sign-in">
-                    Get started
-                    <ArrowRightIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-                  </Link>
-                </Button>
-              )}
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
-      </div>
-    </nav>
+    <>
+      <Suspense
+        fallback={
+          <div className="order-3 w-full md:order-0 md:max-w-md md:flex-1" />
+        }
+      >
+        <NavbarSearch />
+      </Suspense>
+      <NavigationMenu className="shrink-0">
+        <NavigationMenuList className="flex items-center gap-2">
+          <NavigationMenuItem>
+            {session?.user ? (
+              <div className="flex items-center gap-3">
+                <WriteLogButton />
+                <UserButton
+                  userImage={session.user.image}
+                  userImageFallback={session.user.name?.[0]?.toLocaleUpperCase()}
+                  username={session.user.username}
+                />
+              </div>
+            ) : (
+              <Button asChild className="group">
+                <Link href="/sign-in">
+                  Get started
+                  <ArrowRightIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+              </Button>
+            )}
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+    </>
   );
 }

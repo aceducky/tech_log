@@ -10,7 +10,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import type { LogWithAuthor } from "@/lib/dal";
+import type { LogWithAuthor } from "@/lib/dal/logs_dal";
 import { logDateFormat } from "@/lib/utils";
 import { LogMdRenderer } from "./log_md_renderer";
 import LogOwnerVisibleActions from "./log_owner_visible_actions";

@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { LogWithAuthor } from "@/lib/dal";
+import type { LogWithAuthor } from "@/lib/dal/logs_dal";
 import { logDateFormat } from "@/lib/utils";
 import { LogMdRenderer } from "./log_md_renderer";
 
@@ -18,12 +18,12 @@ type LogCardProps = Omit<
   "id" | "authorId" | "createdAt" | "pageViews" | "updatedAt" | "content"
 > & {
   href: string;
-  summary: string;
+  preview: string;
   createdAt: string | Date;
 };
 export function LogCard(props: LogCardProps) {
   return (
-    <Card>
+    <Card className="mx-2">
       <CardHeader className="pb-2">
         {props.coverImgUrl && (
           <div className="mb-8">
@@ -32,6 +32,7 @@ export function LogCard(props: LogCardProps) {
                 src={props.coverImgUrl}
                 alt={`Image for ${props.title}`}
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover"
                 priority
               />
@@ -52,7 +53,7 @@ export function LogCard(props: LogCardProps) {
       </CardHeader>
       <CardContent className="py-0">
         <CardDescription>
-          <LogMdRenderer content={props.summary} />
+          <LogMdRenderer content={props.preview} showImages={false} />
         </CardDescription>
       </CardContent>
       <CardFooter>

@@ -1,9 +1,9 @@
 "use server";
 
-import { redis } from "@/cache";
 import type { Log } from "@/db/schemas/log-schema";
 import sendCelebrationEmail from "@/email/celebration_email";
 import { Err, Ok, type Result } from "@/lib/result";
+import { redis } from "@/redis";
 
 const LOG_PAGE_VIEWS_KEY_PREFIX = "log_page_views";
 

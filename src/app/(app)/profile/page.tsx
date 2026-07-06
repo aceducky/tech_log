@@ -1,14 +1,16 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { Suspense } from "react";
 import { GitHubIcon } from "@/components/auth/github_icon";
 import LogoutButton from "@/components/auth/logout_button";
 import SessionManagement from "@/components/auth/sessions_management";
+import { ProfileSkeleton } from "@/components/profile_skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { requireSessionServer } from "@/lib/auth/require_session_server";
 
-export default async function ProfilePage() {
+async function ProfileContent() {
   const { user, session } = await requireSessionServer();
 
   return (
@@ -54,5 +56,15 @@ export default async function ProfilePage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default async function ProfilePage() {
+  return (
+    <Suspense
+      fallback={<ProfileSkeleton />}
+    >
+      <ProfileContent />
+    </Suspense>
   );
 }

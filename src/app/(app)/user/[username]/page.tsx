@@ -1,45 +1,95 @@
+import { Suspense } from "react";
 import { LogCard } from "@/components/log/log_card";
-import { getLogsByUsername } from "@/lib/dal";
+import { LogFeedSkeleton } from "@/components/log/log_feed_skeleton";
+import {
+  LogPagination,
+  LogSortControls,
+} from "@/components/log/log_pagination";
+import { getLogsByUsername, parseLogsSearchParams } from "@/lib/dal/logs_dal";
 import { logDateFormat } from "@/lib/utils";
 
-export default async function UserLogsPage(props: {
+async function UserLogsFeed({
+  params,
+  searchParams,
+}: {
   params: Promise<{ username: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const params = await props.params;
-  const logs = await getLogsByUsername(params.username);
+  const { username } = await params;
+  const rawSearch = await searchParams;
+  const filters = parseLogsSearchParams(rawSearch);
+  const result = await getLogsByUsername(username, {
+    page: filters.page,
+    sort: filters.sort,
+  });
 
-  if (logs.error) {
+  if (result.error) {
     return (
-      <div className="text-destructive mt-10 text-center">
-        Error: {logs.message}
+      <div className="mt-10 text-center text-destructive">
+        Error: {result.message}
       </div>
     );
   }
 
+  const page = result.data;
+  if (!page) {
+    return <div>No logs</div>;
+  }
+
+  const basePath = `/user/${username}`;
+
   return (
     <div>
-      <h1 className="text-2xl font-bold text-center mt-10">
-        Logs by @{params.username} {logs.data?.[0]?.authorName}
+      <h1 className="mt-10 text-center text-2xl font-bold">
+        Logs by @{username} {page.logs[0]?.authorName}
       </h1>
-      <main className="max-w-2xl mx-auto mt-10 flex flex-col gap-6 mb-4">
-        {logs.data?.length === 0 && (
-          <p className="text-center text-muted-foreground mt-4">
+      <main className="mx-auto mt-10 mb-4 flex max-w-2xl flex-col gap-6">
+        {page.logs.length === 0 ? (
+          <p className="mt-4 text-center text-muted-foreground">
             The user hasn't written any logs yet.
           </p>
+        ) : (
+          <>
+            <LogSortControls
+              currentPage={page.currentPage}
+              totalPages={page.totalPages}
+              sort={page.sort}
+              basePath={basePath}
+            />
+            {page.logs.map((log) => (
+              <LogCard
+                key={log.id}
+                title={log.title}
+                authorUsername={log.authorUsername}
+                authorName={log.authorName}
+                createdAt={logDateFormat(log.createdAt)}
+                coverImgUrl={log.coverImgUrl}
+                preview={log.content.substring(0, 200)}
+                href={`/logs/${log.id}`}
+              />
+            ))}
+            <LogPagination
+              currentPage={page.currentPage}
+              totalPages={page.totalPages}
+              sort={page.sort}
+              basePath={basePath}
+            />
+          </>
         )}
-        {logs.data?.map((log) => (
-          <LogCard
-            key={log.id}
-            title={log.title}
-            authorUsername={log.authorUsername}
-            authorName={log.authorName}
-            createdAt={logDateFormat(log.createdAt)}
-            coverImgUrl={log.coverImgUrl}
-            summary={log.content.substring(0, 200)}
-            href={`/logs/${log.id}`}
-          />
-        ))}
       </main>
     </div>
+  );
+}
+
+export default async function UserLogsPage(props: {
+  params: Promise<{ username: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return (
+    <Suspense
+        fallback={<LogFeedSkeleton />}
+    >
+      <UserLogsFeed params={props.params} searchParams={props.searchParams} />
+    </Suspense>
   );
 }

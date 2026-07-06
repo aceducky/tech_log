@@ -5,8 +5,9 @@ import MDEditor from "@uiw/react-md-editor";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import rehypeSanitize from "rehype-sanitize";
 import { toast } from "sonner";
-import { updateLog } from "@/app/actions/logs";
+import { updateLog } from "@/app/actions/logs_actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -142,6 +143,9 @@ export default function EditLogForm({
                       value={field.value}
                       onChange={(value) => field.onChange(value ?? "")}
                       onBlur={field.onBlur}
+                      previewOptions={{
+                        rehypePlugins: [[rehypeSanitize]],
+                      }}
                       autoCapitalize="off"
                       autoCorrect="off"
                       data-color-mode="light"

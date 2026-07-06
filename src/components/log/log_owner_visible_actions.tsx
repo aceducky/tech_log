@@ -1,7 +1,7 @@
 import { Edit, Trash } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { deleteLog } from "@/app/actions/logs";
+import { deleteLog } from "@/app/actions/logs_actions";
 import type { Log } from "@/db/schemas/log-schema";
 import { cn } from "@/lib/utils";
 import { ActionButton } from "../ui/action-button";
