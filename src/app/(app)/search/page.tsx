@@ -5,6 +5,7 @@ import {
   LogPagination,
   LogSortControls,
 } from "@/components/log/log_pagination";
+import { Skeleton } from "@/components/ui/skeleton";
 import { parseLogsSearchParams, searchLogs } from "@/lib/dal/logs_dal";
 import { logDateFormat } from "@/lib/utils";
 
@@ -93,9 +94,17 @@ export default async function SearchPage(props: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   return (
-    <main className="mx-auto mt-10 mb-4 flex max-w-2xl flex-col gap-6">
+    <main className="mx-auto mt-10 mb-4 flex w-full max-w-2xl flex-col gap-6">
       <Suspense
-        fallback={<LogFeedSkeleton />}
+        fallback={
+          <>
+            <div className="space-y-2">
+              <Skeleton className="h-8 w-48" />
+              <Skeleton className="h-4 w-32" />
+            </div>
+            <LogFeedSkeleton />
+          </>
+        }
       >
         <SearchResults searchParams={props.searchParams} />
       </Suspense>

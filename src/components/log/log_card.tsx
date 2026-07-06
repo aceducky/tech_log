@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { LogWithAuthor } from "@/lib/dal/logs_dal";
 import { logDateFormat } from "@/lib/utils";
 import { LogMdRenderer } from "./log_md_renderer";
@@ -63,6 +64,31 @@ export function LogCard(props: LogCardProps) {
         >
           Read log <ArrowRight className="w-4 h-4" />
         </Link>
+      </CardFooter>
+    </Card>
+  );
+}
+
+export function LogCardSkeleton() {
+  return (
+    <Card className="mx-2">
+      <CardHeader className="pb-2">
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-4 w-24" />
+        </div>
+        <Skeleton className="h-7 w-3/4" />
+      </CardHeader>
+      <CardContent className="py-0">
+        <CardDescription className="space-y-2 mb-4">
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-[90%]" />
+          <Skeleton className="h-4 w-[80%]" />
+        </CardDescription>
+      </CardContent>
+      <CardFooter>
+        <Skeleton className="h-5 w-24" />
       </CardFooter>
     </Card>
   );

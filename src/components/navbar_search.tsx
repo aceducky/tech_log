@@ -2,7 +2,7 @@
 
 import { SearchIcon, X } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { type SubmitEvent, useRef, useState } from "react";
+import { type SubmitEvent, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -25,6 +25,11 @@ export function NavbarSearch() {
   const currentQuery =
     pathname === "/search" ? (searchParams.get("q") ?? "") : "";
   const [queryVal, setQueryVal] = useState(currentQuery);
+
+  useEffect(() => {
+    setQueryVal(currentQuery);
+    inputRef.current?.blur();
+  }, [currentQuery]);
 
   function navigateToSearch(nextQuery: string) {
     const href = buildSearchHref(nextQuery);

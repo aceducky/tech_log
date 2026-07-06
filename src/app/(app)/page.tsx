@@ -66,10 +66,8 @@ export default async function Home(props: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   return (
-    <main className="mx-auto mt-10 mb-4 flex max-w-2xl flex-col gap-6">
-      <Suspense
-        fallback={<LogFeedSkeleton />}
-      >
+    <main className="mx-auto mt-10 mb-4 flex w-full max-w-2xl flex-col gap-6">
+      <Suspense fallback={<LogFeedSkeleton />}>
         <LogsFeed searchParams={props.searchParams} />
       </Suspense>
     </main>

@@ -2,13 +2,10 @@
 
 import { LogOut } from "lucide-react";
 
-import { usePathname, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth/auth-client";
 import { BetterAuthActionButton } from "./better_auth_action_button";
 
 export default function LogoutButton() {
-  const router = useRouter();
-  const pathName = usePathname();
   return (
     <BetterAuthActionButton
       variant="destructive"
@@ -16,8 +13,7 @@ export default function LogoutButton() {
         await authClient.signOut({
           fetchOptions: {
             onSuccess: () => {
-              if (pathName !== "/") router.replace("/");
-              router.refresh();
+              window.location.href = "/";
             },
           },
         })

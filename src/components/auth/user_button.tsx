@@ -4,7 +4,6 @@ import type { User } from "better-auth";
 import { BookIcon, LogOutIcon, UserIcon } from "lucide-react";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth/auth-client";
@@ -25,8 +24,6 @@ export type UserButtonProps = {
 };
 
 export default function UserButton(props: UserButtonProps) {
-  const router = useRouter();
-  const pathName = usePathname();
   const [isLoggingOut, startLogout] = useTransition();
 
   const handleLogOut = async () => {
@@ -34,8 +31,7 @@ export default function UserButton(props: UserButtonProps) {
       const { error } = await authClient.signOut({
         fetchOptions: {
           onSuccess: () => {
-            if (pathName !== "/") router.replace("/");
-            router.refresh();
+            window.location.href = "/";
           },
         },
       });

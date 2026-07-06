@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import LogViewer from "@/components/log/log_viewer";
-import { LogViewerSkeleton } from "@/components/log/log_viewer_skeleton";
+import LogViewer, { LogViewerSkeleton } from "@/components/log/log_viewer";
 import { logIdSchema } from "@/db/schemas/log-schema";
 import { getCurrentSession } from "@/lib/auth/get_current_session";
 import { getLogById } from "@/lib/dal/logs_dal";
@@ -32,9 +31,7 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   return (
-    <Suspense
-      fallback={<LogViewerSkeleton />}
-    >
+    <Suspense fallback={<LogViewerSkeleton />}>
       <LogDetail params={params} />
     </Suspense>
   );

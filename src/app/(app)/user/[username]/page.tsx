@@ -5,6 +5,7 @@ import {
   LogPagination,
   LogSortControls,
 } from "@/components/log/log_pagination";
+import { Skeleton } from "@/components/ui/skeleton";
 import { getLogsByUsername, parseLogsSearchParams } from "@/lib/dal/logs_dal";
 import { logDateFormat } from "@/lib/utils";
 
@@ -43,7 +44,7 @@ async function UserLogsFeed({
       <h1 className="mt-10 text-center text-2xl font-bold">
         Logs by @{username} {page.logs[0]?.authorName}
       </h1>
-      <main className="mx-auto mt-10 mb-4 flex max-w-2xl flex-col gap-6">
+      <main className="mx-auto mt-10 mb-4 flex w-full max-w-2xl flex-col gap-6">
         {page.logs.length === 0 ? (
           <p className="mt-4 text-center text-muted-foreground">
             The user hasn't written any logs yet.
@@ -87,7 +88,16 @@ export default async function UserLogsPage(props: {
 }) {
   return (
     <Suspense
-        fallback={<LogFeedSkeleton />}
+      fallback={
+        <div>
+          <div className="flex justify-center mt-10">
+            <Skeleton className="h-8 w-64" />
+          </div>
+          <main className="mx-auto mt-10 mb-4 flex w-full max-w-2xl flex-col gap-6">
+            <LogFeedSkeleton />
+          </main>
+        </div>
+      }
     >
       <UserLogsFeed params={props.params} searchParams={props.searchParams} />
     </Suspense>
