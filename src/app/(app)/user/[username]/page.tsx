@@ -8,14 +8,14 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { getLogsByUsername, parseLogsSearchParams } from "@/lib/dal/logs_dal";
 import { logDateFormat } from "@/lib/utils";
+import type { SearchParamsProps } from "@/types/search_params";
 
 async function UserLogsFeed({
   params,
   searchParams,
 }: {
   params: Promise<{ username: string }>;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
+} & SearchParamsProps) {
   const { username } = await params;
   const rawSearch = await searchParams;
   const filters = parseLogsSearchParams(rawSearch);
@@ -25,11 +25,7 @@ async function UserLogsFeed({
   });
 
   if (result.error) {
-    return (
-      <div className="mt-10 text-center text-destructive">
-        Error: {result.message}
-      </div>
-    );
+    throw new Error(result.message);
   }
 
   const page = result.data;
@@ -82,10 +78,11 @@ async function UserLogsFeed({
   );
 }
 
-export default async function UserLogsPage(props: {
-  params: Promise<{ username: string }>;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
+export default async function UserLogsPage(
+  props: {
+    params: Promise<{ username: string }>;
+  } & SearchParamsProps,
+) {
   return (
     <Suspense
       fallback={

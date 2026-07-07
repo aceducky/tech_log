@@ -15,8 +15,12 @@ async function LogDetail({ params }: { params: Promise<{ id: string }> }) {
 
   const res = await getLogById(validationRes.data);
 
+  if (res.error && res.message === "Log not found") {
+    return notFound();
+  }
+
   if (res.error || !res.data) {
-    return <div className="text-destructive">{res.message}</div>;
+    throw new Error(res.message);
   }
 
   const session = await getCurrentSession();

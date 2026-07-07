@@ -1,14 +1,15 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import MDEditor from "@uiw/react-md-editor";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import rehypeSanitize from "rehype-sanitize";
 import { toast } from "sonner";
 import { updateLog } from "@/app/actions/logs_actions";
 import { Button } from "@/components/ui/button";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Field,
@@ -26,6 +27,7 @@ import {
   type Log,
 } from "@/db/schemas/log-schema";
 import { UploadDropzone } from "@/lib/uploadthing";
+import { ClientOnlyMDEditor } from "../client_only_mdeditor";
 import CancelButton from "./cancel_btn";
 
 type EditLogFormProps = {
@@ -52,6 +54,7 @@ export default function EditLogForm({
   coverImgUrl,
 }: EditLogFormProps) {
   const router = useRouter();
+  const { resolvedTheme } = useTheme();
   const [dropzoneKey, setDropzoneKey] = useState(0);
   const [coverPreviewUrl, setCoverPreviewUrl] = useState<string>();
   const [showCoverPreview, setShowCoverPreview] = useState(!!coverImgUrl);
@@ -140,7 +143,7 @@ export default function EditLogForm({
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>Content</FieldLabel>
-                    <MDEditor
+                    <ClientOnlyMDEditor
                       value={field.value}
                       onChange={(value) => field.onChange(value ?? "")}
                       onBlur={field.onBlur}
@@ -149,7 +152,9 @@ export default function EditLogForm({
                       }}
                       autoCapitalize="off"
                       autoCorrect="off"
-                      data-color-mode="light"
+                      data-color-mode={
+                        resolvedTheme === "dark" ? "dark" : "light"
+                      }
                       textareaProps={{
                         placeholder: "Write your content in markdown",
                         style: {

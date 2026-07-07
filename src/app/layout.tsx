@@ -6,6 +6,7 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { Toaster } from "sonner";
 import { extractRouterConfig } from "uploadthing/server";
+import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 import { coverImgFileRouter } from "./api/uploadthing/core";
 
@@ -41,6 +42,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={cn(
         "h-full",
         "antialiased",
@@ -51,11 +53,18 @@ export default function RootLayout({
       )}
     >
       <body className="min-h-full flex flex-col">
-        <Suspense>
-          <UTSSR />
-        </Suspense>
-        {children}
-        <Toaster richColors={true} />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Suspense>
+            <UTSSR />
+          </Suspense>
+          {children}
+          <Toaster richColors={true} />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -8,12 +8,9 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { parseLogsSearchParams, searchLogs } from "@/lib/dal/logs_dal";
 import { logDateFormat } from "@/lib/utils";
+import type { SearchParamsProps } from "@/types/search_params";
 
-async function SearchResults({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
+async function SearchResults({ searchParams }: SearchParamsProps) {
   const raw = await searchParams;
   const filters = parseLogsSearchParams(raw);
 
@@ -31,11 +28,7 @@ async function SearchResults({
   const result = await searchLogs(filters);
 
   if (result.error) {
-    return (
-      <div className="mt-10 text-center text-destructive">
-        Error: {result.message}
-      </div>
-    );
+    throw new Error(result.message);
   }
 
   const page = result.data;
@@ -90,9 +83,7 @@ async function SearchResults({
   );
 }
 
-export default async function SearchPage(props: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
+export default async function SearchPage(props: SearchParamsProps) {
   return (
     <main className="mx-auto mt-10 mb-4 flex w-full max-w-2xl flex-col gap-6">
       <Suspense

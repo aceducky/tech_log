@@ -13,6 +13,7 @@
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
     "email:dev": "email dev --dir src/email/templates --port 3001"
   },
   "dependencies": {
@@ -22,7 +23,6 @@
     "@t3-oss/env-nextjs": "^0.13.11",
     "@uiw/react-md-editor": "^4.1.1",
     "@uploadthing/react": "^7.3.3",
-    "@upstash/redis": "^1.38.0",
     "better-auth": "^1.6.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

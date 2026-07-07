@@ -1,12 +1,5 @@
 import { type SQL, sql } from "drizzle-orm";
-import {
-  customType,
-  index,
-  integer,
-  pgTable,
-  text,
-  uuid,
-} from "drizzle-orm/pg-core";
+import { customType, index, pgTable, text, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import z from "zod";
 import { MAX_LOG_CONTENT_LEN, MAX_LOG_TITLE_LEN } from "@/config/constants";
@@ -29,7 +22,6 @@ export const logTable = pgTable(
     title: text("title").notNull(),
     content: text("content").notNull(),
     coverImgUrl: text("image_url"),
-    pageViews: integer("page_views"),
     searchVector: tsvector("search_vector")
       .notNull()
       .generatedAlwaysAs(
@@ -42,7 +34,11 @@ export const logTable = pgTable(
       ),
     ...timestamps,
   },
-  (table) => [index("log_search_idx").using("gin", table.searchVector)],
+  (table) => [
+    index("log_search_idx").using("gin", table.searchVector),
+    index("log_author_id_idx").on(table.authorId),
+    index("log_created_at_idx").on(table.createdAt),
+  ],
 );
 
 export type Log = typeof logTable.$inferSelect;

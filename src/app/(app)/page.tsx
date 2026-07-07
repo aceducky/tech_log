@@ -8,17 +8,15 @@ import {
 import { getLogs, parseLogsSearchParams } from "@/lib/dal/logs_dal";
 import { logDateFormat } from "@/lib/utils";
 
-async function LogsFeed({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
+import type { SearchParamsProps } from "@/types/search_params";
+
+async function LogsFeed({ searchParams }: SearchParamsProps) {
   const raw = await searchParams;
   const filters = parseLogsSearchParams(raw);
   const result = await getLogs({ page: filters.page, sort: filters.sort });
 
   if (result.error) {
-    return <div className="text-destructive">Error: {result.message}</div>;
+    throw new Error(result.message);
   }
 
   const page = result.data;
@@ -62,9 +60,7 @@ async function LogsFeed({
   );
 }
 
-export default async function Home(props: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
+export default async function Home(props: SearchParamsProps) {
   return (
     <main className="mx-auto mt-10 mb-4 flex w-full max-w-2xl flex-col gap-6">
       <Suspense fallback={<LogFeedSkeleton />}>

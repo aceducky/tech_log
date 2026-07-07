@@ -12,6 +12,7 @@ import { auth } from "@/lib/auth";
 import UserButton from "./auth/user_button";
 import WriteLogButton from "./log/write_log_button";
 import { NavbarSearch } from "./navbar_search";
+import { ThemeToggle } from "./theme-toggle";
 import { Skeleton } from "./ui/skeleton";
 
 async function NavbarActions() {
@@ -56,6 +57,9 @@ export function Navbar() {
         </Suspense>
         <NavigationMenu className="shrink-0">
           <NavigationMenuList className="flex items-center gap-2">
+            <NavigationMenuItem>
+              <ThemeToggle />
+            </NavigationMenuItem>
             <NavigationMenuItem>
               <Suspense fallback={<Skeleton className="h-10 w-40" />}>
                 <NavbarActions />

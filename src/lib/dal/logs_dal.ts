@@ -7,6 +7,8 @@ import z from "zod";
 import { db } from "@/db";
 import { user } from "@/db/schemas/auth-schema";
 import { type Log, logTable } from "@/db/schemas/log-schema";
+import { logViewsTable } from "@/db/schemas/log-views-schema";
+import type { SearchParams } from "@/types/search_params";
 import type { DbUser } from "../auth/types";
 import { Err, Ok, type Result } from "../result";
 
@@ -48,7 +50,7 @@ const logWithAuthorSelect = {
   authorName: user.name,
   createdAt: logTable.createdAt,
   updatedAt: logTable.updatedAt,
-  pageViews: logTable.pageViews,
+  pageViews: db.$count(logViewsTable, eq(logViewsTable.logId, logTable.id)),
   coverImgUrl: logTable.coverImgUrl,
 };
 
@@ -74,7 +76,7 @@ function getSortOrder(sort: LogsSort) {
 }
 
 export function parseLogsSearchParams(
-  searchParams: Record<string, string | string[] | undefined>,
+  searchParams: SearchParams,
 ): LogsSearchParams {
   return logsSearchParamsSchema.parse({
     page: getFirstSearchParam(searchParams.page),
@@ -126,6 +128,7 @@ export function getPaginationItems(
 export const GET_LOGS_CACHE_TAG = "getLogs";
 export const GET_LOG_BY_ID_CACHE_TAG = "getLogById";
 export const GET_LOGS_BY_USERNAME_CACHE_TAG = "getLogsByUsername";
+
 export async function getLogs(input: LogsListInput): Promise<Result<LogsPage>> {
   "use cache";
   cacheLife("minutes");
