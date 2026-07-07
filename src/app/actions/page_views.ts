@@ -1,30 +1,61 @@
 "use server";
 
-import { redis } from "@/cache";
+import { generateId } from "better-auth";
+import { eq } from "drizzle-orm";
+import { cookies } from "next/headers";
+import { db } from "@/db";
 import type { Log } from "@/db/schemas/log-schema";
+import { logViewsTable } from "@/db/schemas/log-views-schema";
 import sendCelebrationEmail from "@/email/celebration_email";
+import { getCurrentSession } from "@/lib/auth/get_current_session";
 import { Err, Ok, type Result } from "@/lib/result";
 
-const LOG_PAGE_VIEWS_KEY_PREFIX = "log_page_views";
-
 const milestones = new Set([10, 50, 100, 1_000, 10_000, 100_000]);
-
-const keyFor = (id: Log["id"]) => `${LOG_PAGE_VIEWS_KEY_PREFIX}:${id}`;
 
 export async function incrementPageViews(
   logId: Log["id"],
 ): Promise<Result<number>> {
   try {
-    const logKey = keyFor(logId);
-    const inc = await redis.incr(logKey);
-
-    if (milestones.has(inc)) {
-      sendCelebrationEmail({ logId, pageViews: inc });
+    const session = await getCurrentSession();
+    let viewerKey: string;
+    if (session?.user.id) {
+      viewerKey = session.user.id;
+    } else {
+      const cookieStore = await cookies();
+      viewerKey = cookieStore.get("viewer-key")?.value || "";
     }
 
-    return Ok({ data: inc });
+    if (!viewerKey) {
+      viewerKey = generateId();
+      const cookieStore = await cookies();
+      cookieStore.set("viewer-key", viewerKey, {
+        maxAge: 60 * 60 * 24 * 365,
+        httpOnly: true,
+        path: "/",
+        sameSite: "lax",
+        secure: process.env.NODE_ENV?.toLowerCase() === "production",
+      });
+    }
+
+    await db
+      .insert(logViewsTable)
+      .values({ logId, viewerKey })
+      .onConflictDoNothing();
+
+    const count = await db.$count(
+      logViewsTable,
+      eq(logViewsTable.logId, logId),
+    );
+
+    const currViews = count;
+
+    if (milestones.has(currViews)) {
+      sendCelebrationEmail({ logId, pageViews: currViews });
+    }
+
+    return Ok({ data: currViews });
   } catch (e) {
-    console.error("Couldn't increment log page view", e);
-    return Err({ message: "Couldn't increment log page view" });
+    console.warn("could not increment page view", e);
+    return Err({ message: "could not increment page view" });
   }
 }

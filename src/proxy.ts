@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { logIdSchema } from "@/db/schemas/log-schema";
 
 function isPublicRoute(pathname: string): boolean {
-  if (pathname === "/") return true;
+  if (pathname === "/" || pathname === "/search") return true;
 
   const segments = pathname.split("/").filter(Boolean);
 

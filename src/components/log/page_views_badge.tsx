@@ -16,7 +16,7 @@ export default function PageViewsBadge({
       aria-label="page views"
     >
       <Eye className="h-4 w-4" />
-      {pageviews} views
+      {pageviews} {pageviews === 1 ? "view" : "views"}
     </Badge>
   );
 }

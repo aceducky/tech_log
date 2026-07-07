@@ -3,12 +3,17 @@ import rehypeSanitize from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
 import { cn } from "@/lib/utils";
 
-interface LogMdRendererProps {
+type LogMdRendererProps = {
   content: string;
   classname?: string;
-}
+  showImages?: boolean;
+};
 
-export function LogMdRenderer({ content, classname }: LogMdRendererProps) {
+export function LogMdRenderer({
+  content,
+  classname,
+  showImages = true,
+}: LogMdRendererProps) {
   return (
     <div
       className={cn(
@@ -94,6 +99,19 @@ export function LogMdRenderer({ content, classname }: LogMdRendererProps) {
           td: ({ children }) => (
             <td className="border border-border px-4 py-2">{children}</td>
           ),
+          img: ({ src, alt }) => {
+            if (!showImages) {
+              return null;
+            }
+            return (
+              // biome-ignore lint/performance/noImgElement: Standard img tag is necessary here as react-markdown cannot easily provide width/height for next/image
+              <img
+                src={src}
+                alt={alt}
+                className="rounded-lg max-w-full h-auto my-4"
+              />
+            );
+          },
         }}
       >
         {content}

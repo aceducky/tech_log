@@ -1,8 +1,7 @@
 import Image from "next/image";
-import Link from "next/link";
 import type { HTMLAttributes } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Field, FieldDescription, FieldGroup } from "@/components/ui/field";
+import { Field, FieldGroup } from "@/components/ui/field";
 import { cn } from "@/lib/utils";
 import { OAuthButton } from "./oauth_button";
 
@@ -40,11 +39,6 @@ export default function AuthForm({
           </div>
         </CardContent>
       </Card>
-      <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our{" "}
-        <Link href="/terms">Terms of Service</Link> and{" "}
-        <Link href="/privacy">Privacy Policy</Link>.
-      </FieldDescription>
     </div>
   );
 }

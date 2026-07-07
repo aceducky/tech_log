@@ -1,13 +1,15 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import MDEditor from "@uiw/react-md-editor";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import rehypeSanitize from "rehype-sanitize";
 import { toast } from "sonner";
-import { updateLog } from "@/app/actions/logs";
+import { updateLog } from "@/app/actions/logs_actions";
 import { Button } from "@/components/ui/button";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Field,
@@ -17,6 +19,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { MAX_LOG_COVER_IMG_SIZE } from "@/config/constants";
 import {
   type EditLogFormValues,
@@ -24,6 +27,7 @@ import {
   type Log,
 } from "@/db/schemas/log-schema";
 import { UploadDropzone } from "@/lib/uploadthing";
+import { ClientOnlyMDEditor } from "../client_only_mdeditor";
 import CancelButton from "./cancel_btn";
 
 type EditLogFormProps = {
@@ -50,6 +54,7 @@ export default function EditLogForm({
   coverImgUrl,
 }: EditLogFormProps) {
   const router = useRouter();
+  const { resolvedTheme } = useTheme();
   const [dropzoneKey, setDropzoneKey] = useState(0);
   const [coverPreviewUrl, setCoverPreviewUrl] = useState<string>();
   const [showCoverPreview, setShowCoverPreview] = useState(!!coverImgUrl);
@@ -138,13 +143,18 @@ export default function EditLogForm({
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>Content</FieldLabel>
-                    <MDEditor
+                    <ClientOnlyMDEditor
                       value={field.value}
                       onChange={(value) => field.onChange(value ?? "")}
                       onBlur={field.onBlur}
+                      previewOptions={{
+                        rehypePlugins: [[rehypeSanitize]],
+                      }}
                       autoCapitalize="off"
                       autoCorrect="off"
-                      data-color-mode="light"
+                      data-color-mode={
+                        resolvedTheme === "dark" ? "dark" : "light"
+                      }
                       textareaProps={{
                         placeholder: "Write your content in markdown",
                         style: {
@@ -248,6 +258,39 @@ export default function EditLogForm({
               </Button>
             </div>
           </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+export function EditLogFormSkeleton() {
+  return (
+    <div>
+      <Card className="mx-auto w-full max-w-4xl px-4">
+        <CardHeader>
+          <CardTitle>Edit Log</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-3">
+              <Skeleton className="h-4 w-12" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="flex flex-col gap-3">
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-96 w-full" />
+            </div>
+            <div className="flex flex-col gap-3">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-40 w-full rounded-2xl" />
+            </div>
+            <div className="mt-4 flex items-center justify-end gap-4">
+              <Skeleton className="h-10 w-32" />
+              <Skeleton className="h-10 w-28" />
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
