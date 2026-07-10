@@ -18,7 +18,7 @@ export function OAuthButton() {
         setIsPending(true);
         const res = await authClient.signIn.social({
           provider: "github",
-          callbackURL: "/",
+          callbackURL: "/logs",
         });
         return res;
       }}
