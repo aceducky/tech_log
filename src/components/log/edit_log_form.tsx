@@ -2,10 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import rehypeSanitize from "rehype-sanitize";
 import { toast } from "sonner";
 import { updateLog } from "@/app/actions/logs_actions";
 import { Button } from "@/components/ui/button";
@@ -27,8 +25,8 @@ import {
   type Log,
 } from "@/db/schemas/log-schema";
 import { UploadDropzone } from "@/lib/uploadthing";
-import { ClientOnlyMDEditor } from "../client_only_mdeditor";
 import CancelButton from "./cancel_btn";
+import { LogMDEditor } from "./log_md_editor";
 
 type EditLogFormProps = {
   id: Log["id"];
@@ -54,7 +52,6 @@ export default function EditLogForm({
   coverImgUrl,
 }: EditLogFormProps) {
   const router = useRouter();
-  const { resolvedTheme } = useTheme();
   const [dropzoneKey, setDropzoneKey] = useState(0);
   const [coverPreviewUrl, setCoverPreviewUrl] = useState<string>();
   const [showCoverPreview, setShowCoverPreview] = useState(!!coverImgUrl);
@@ -143,25 +140,10 @@ export default function EditLogForm({
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>Content</FieldLabel>
-                    <ClientOnlyMDEditor
-                      value={field.value}
+                    <LogMDEditor
+                      value={field.value ?? ""}
                       onChange={(value) => field.onChange(value ?? "")}
                       onBlur={field.onBlur}
-                      previewOptions={{
-                        rehypePlugins: [[rehypeSanitize]],
-                      }}
-                      autoCapitalize="off"
-                      autoCorrect="off"
-                      data-color-mode={
-                        resolvedTheme === "dark" ? "dark" : "light"
-                      }
-                      textareaProps={{
-                        placeholder: "Write your content in markdown",
-                        style: {
-                          fontSize: 14,
-                          lineHeight: 1.3,
-                        },
-                      }}
                     />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />

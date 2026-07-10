@@ -20,3 +20,19 @@ export function sessionDateFormat(date: Date): string {
     timeStyle: "short",
   }).format(date);
 }
+
+export function generateLogPreview(content: string, maxLength = 250): string {
+  if (!content) return "";
+  if (content.length <= maxLength) return content;
+
+  let truncated = content.substring(0, maxLength);
+
+  // Find the last space to avoid cutting words in half
+  const lastSpaceIndex = truncated.lastIndexOf(" ");
+
+  if (lastSpaceIndex > 0) {
+    truncated = truncated.substring(0, lastSpaceIndex);
+  }
+
+  return truncated;
+}

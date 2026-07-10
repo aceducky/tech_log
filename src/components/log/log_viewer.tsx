@@ -30,7 +30,7 @@ export default async function LogViewer({
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-6">
         <Link
-          href="/"
+          href="/logs"
           className="flex items-center hover:text-foreground transition-colors"
         >
           <Home className="h-4 w-4 mr-1" />
@@ -58,7 +58,8 @@ export default async function LogViewer({
               <div className="flex items-center">
                 <Calendar className="h-4 w-4 mr-1" />
                 <span>{logDateFormat(log.createdAt)}</span>
-                {log.createdAt !== log.updatedAt && (
+                {log.createdAt.toDateString() !==
+                  log.updatedAt.toDateString() && (
                   <span className="flex items-center ml-1">
                     <Info className="w-4 h-4 mr-1" /> Updated on:
                     {logDateFormat(log.updatedAt)}
@@ -93,7 +94,7 @@ export default async function LogViewer({
       </Card>
 
       <div className="mt-8 flex justify-between items-center">
-        <Link href="/">
+        <Link href="/logs">
           <Button variant="outline">
             <ArrowLeft className="mr-2" /> Back to Logs
           </Button>

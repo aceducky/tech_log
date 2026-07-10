@@ -31,6 +31,10 @@ export function NavbarSearch() {
     inputRef.current?.blur();
   }, [currentQuery]);
 
+  if (pathname === "/") {
+    return null;
+  }
+
   function navigateToSearch(nextQuery: string) {
     const href = buildSearchHref(nextQuery);
 

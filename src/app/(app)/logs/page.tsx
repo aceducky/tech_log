@@ -5,27 +5,15 @@ import {
   LogPagination,
   LogSortControls,
 } from "@/components/log/log_pagination";
-import { Skeleton } from "@/components/ui/skeleton";
-import { parseLogsSearchParams, searchLogs } from "@/lib/dal/logs_dal";
+import { getLogs, parseLogsSearchParams } from "@/lib/dal/logs_dal";
 import { generateLogPreview, logDateFormat } from "@/lib/utils";
+
 import type { SearchParamsProps } from "@/types/search_params";
 
-async function SearchResults({ searchParams }: SearchParamsProps) {
+async function LogsFeed({ searchParams }: SearchParamsProps) {
   const raw = await searchParams;
   const filters = parseLogsSearchParams(raw);
-
-  if (!filters.query.trim()) {
-    return (
-      <div className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">Search logs</h1>
-        <p className="text-sm text-muted-foreground">
-          Search by title or content to find a log quickly.
-        </p>
-      </div>
-    );
-  }
-
-  const result = await searchLogs(filters);
+  const result = await getLogs({ page: filters.page, sort: filters.sort });
 
   if (result.error) {
     throw new Error(result.message);
@@ -38,25 +26,15 @@ async function SearchResults({ searchParams }: SearchParamsProps) {
 
   return (
     <>
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Results for &quot;{filters.query}&quot;
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {page.totalLogs} matching {page.totalLogs === 1 ? "log" : "logs"}
-        </p>
-      </div>
-
       <LogSortControls
         currentPage={page.currentPage}
         totalPages={page.totalPages}
         sort={page.sort}
-        query={filters.query}
-        basePath="/search"
+        basePath="/"
       />
 
       {page.logs.length === 0 ? (
-        <p className="text-muted-foreground">No logs matched your search.</p>
+        <p className="text-muted-foreground">No logs yet.</p>
       ) : (
         page.logs.map((log) => (
           <LogCard
@@ -76,28 +54,17 @@ async function SearchResults({ searchParams }: SearchParamsProps) {
         currentPage={page.currentPage}
         totalPages={page.totalPages}
         sort={page.sort}
-        query={filters.query}
-        basePath="/search"
+        basePath="/"
       />
     </>
   );
 }
 
-export default async function SearchPage(props: SearchParamsProps) {
+export default async function Home(props: SearchParamsProps) {
   return (
     <main className="mx-auto mt-10 mb-4 flex w-full max-w-2xl flex-col gap-6">
-      <Suspense
-        fallback={
-          <>
-            <div className="space-y-2">
-              <Skeleton className="h-8 w-48" />
-              <Skeleton className="h-4 w-32" />
-            </div>
-            <LogFeedSkeleton />
-          </>
-        }
-      >
-        <SearchResults searchParams={props.searchParams} />
+      <Suspense fallback={<LogFeedSkeleton />}>
+        <LogsFeed searchParams={props.searchParams} />
       </Suspense>
     </main>
   );
