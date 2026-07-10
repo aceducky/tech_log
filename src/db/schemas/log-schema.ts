@@ -45,16 +45,23 @@ export type Log = typeof logTable.$inferSelect;
 
 export const createLogFormSchema = createInsertSchema(logTable, {
   title: z
-    .string()
+    .string({ error: "Title is required." })
     .trim()
-    .min(1, "Title is required")
-    .max(MAX_LOG_TITLE_LEN, "Title is too long"),
+    .min(1, { error: "Please enter a title." })
+    .max(MAX_LOG_TITLE_LEN, {
+      error: `Title cannot exceed ${MAX_LOG_TITLE_LEN} characters.`,
+    }),
   content: z
-    .string()
+    .string({ error: "Content is required." })
     .trim()
-    .min(1, "Content is required")
-    .max(MAX_LOG_CONTENT_LEN, "Content is too long"),
-  coverImgUrl: z.url("Invalid image URL").trim().optional(),
+    .min(1, { error: "Log content cannot be empty." })
+    .max(MAX_LOG_CONTENT_LEN, {
+      error: `Content cannot exceed ${MAX_LOG_CONTENT_LEN} characters.`,
+    }),
+  coverImgUrl: z
+    .url({ error: "Please enter a valid image URL." })
+    .trim()
+    .optional(),
 }).pick({
   title: true,
   content: true,
@@ -63,11 +70,15 @@ export const createLogFormSchema = createInsertSchema(logTable, {
 
 export type CreateLogFormValues = z.infer<typeof createLogFormSchema>;
 
-export const logIdSchema = z.uuid("Invalid log id");
+export const logIdSchema = z.uuid({ error: "Invalid log ID format." });
 
 export const editLogFormSchema = createLogFormSchema.partial().extend({
   id: logIdSchema,
-  coverImgUrl: z.url("Invalid image URL").trim().optional().nullable(),
+  coverImgUrl: z
+    .url({ error: "Please enter a valid image URL." })
+    .trim()
+    .optional()
+    .nullable(),
 });
 
 export type EditLogFormValues = z.infer<typeof editLogFormSchema>;

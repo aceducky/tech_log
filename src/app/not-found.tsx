@@ -8,8 +8,8 @@ export default function NotFound() {
       <h2 className="text-2xl font-bold">Not Found</h2>
       <p>Could not find requested resource</p>
       <Button asChild>
-        <Link href="/">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Return Home
+        <Link href="/logs">
+          <ArrowLeft className="mr-2 h-4 w-4" /> Return to Logs
         </Link>
       </Button>
     </div>

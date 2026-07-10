@@ -2,10 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import rehypeSanitize from "rehype-sanitize";
 import { toast } from "sonner";
 import { createLog } from "@/app/actions/logs_actions";
 import { Button } from "@/components/ui/button";
@@ -25,8 +23,8 @@ import {
   createLogFormSchema,
 } from "@/db/schemas/log-schema";
 import { UploadDropzone } from "@/lib/uploadthing";
-import { ClientOnlyMDEditor } from "../client_only_mdeditor";
 import CancelButton from "./cancel_btn";
+import { LogMDEditor } from "./log_md_editor";
 
 function getCoverUploadErrorMessage(error: Error) {
   if (error.message.includes("FileSizeMismatch")) {
@@ -42,7 +40,6 @@ function getCoverUploadErrorMessage(error: Error) {
 
 export default function CreateLogForm() {
   const router = useRouter();
-  const { resolvedTheme } = useTheme();
   const [dropzoneKey, setDropzoneKey] = useState(0);
   const [coverPreviewUrl, setCoverPreviewUrl] = useState<string>();
 
@@ -131,25 +128,10 @@ export default function CreateLogForm() {
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor={field.name}>Content</FieldLabel>
-                      <ClientOnlyMDEditor
+                      <LogMDEditor
                         value={field.value}
                         onChange={(value) => field.onChange(value ?? "")}
                         onBlur={field.onBlur}
-                        previewOptions={{
-                          rehypePlugins: [[rehypeSanitize]],
-                        }}
-                        autoCapitalize="off"
-                        autoCorrect="off"
-                        data-color-mode={
-                          resolvedTheme === "dark" ? "dark" : "light"
-                        }
-                        textareaProps={{
-                          placeholder: "Write your content in markdown",
-                          style: {
-                            fontSize: 14,
-                            lineHeight: 1.3,
-                          },
-                        }}
                       />
                       {fieldState.invalid && (
                         <FieldError errors={[fieldState.error]} />
@@ -236,7 +218,7 @@ export default function CreateLogForm() {
                   onConfirm={() => {
                     form.reset();
                     resetDropzone();
-                    router.push("/");
+                    router.push("/logs");
                   }}
                 />
                 <Button

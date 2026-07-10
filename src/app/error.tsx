@@ -28,8 +28,8 @@ export default function ErrorPage({
         </Button>
 
         <Button asChild variant="secondary">
-          <Link href="/">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Return Home
+          <Link href="/logs">
+            <ArrowLeft className="mr-2 h-4 w-4" /> Return to logs
           </Link>
         </Button>
       </div>

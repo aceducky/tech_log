@@ -44,8 +44,8 @@ export default function ProfilePage() {
   return (
     <div className="px-4 mb-10">
       <Button asChild variant="secondary">
-        <Link href="/" className="sticky top-20 z-40 py-2 w-fit">
-          <ArrowLeft /> Back to Home
+        <Link href="/logs" className="sticky top-20 z-40 py-2 w-fit">
+          <ArrowLeft /> Back to logs
         </Link>
       </Button>
 

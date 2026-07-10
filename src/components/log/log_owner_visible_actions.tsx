@@ -38,7 +38,7 @@ export default function LogOwnerVisibleActions({
           "use server";
           const res = await deleteLog(logId);
 
-          if (!res.error) redirect("/");
+          if (!res.error) redirect("/logs");
 
           return res;
         }}

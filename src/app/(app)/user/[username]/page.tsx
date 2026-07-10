@@ -7,7 +7,7 @@ import {
 } from "@/components/log/log_pagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getLogsByUsername, parseLogsSearchParams } from "@/lib/dal/logs_dal";
-import { logDateFormat } from "@/lib/utils";
+import { generateLogPreview, logDateFormat } from "@/lib/utils";
 import type { SearchParamsProps } from "@/types/search_params";
 
 async function UserLogsFeed({
@@ -61,7 +61,7 @@ async function UserLogsFeed({
                 authorName={log.authorName}
                 createdAt={logDateFormat(log.createdAt)}
                 coverImgUrl={log.coverImgUrl}
-                preview={log.content.substring(0, 200)}
+                preview={generateLogPreview(log.content)}
                 href={`/logs/${log.id}`}
               />
             ))}

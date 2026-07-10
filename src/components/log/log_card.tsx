@@ -24,11 +24,11 @@ type LogCardProps = Omit<
 };
 export function LogCard(props: LogCardProps) {
   return (
-    <Card className="mx-2">
+    <Card className="mx-2 relative group overflow-hidden transition-all hover:shadow-md hover:border-foreground/20">
       <CardHeader className="pb-2">
         {props.coverImgUrl && (
-          <div className="mb-8">
-            <div className="relative w-full h-64 md:h-80 rounded-lg overflow-hidden">
+          <div className="mb-4 relative z-10">
+            <div className="relative w-full h-48 md:h-64 rounded-lg overflow-hidden">
               <Image
                 src={props.coverImgUrl}
                 alt={`Image for ${props.title}`}
@@ -40,7 +40,7 @@ export function LogCard(props: LogCardProps) {
             </div>
           </div>
         )}
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground relative z-20">
           <Link
             href={`/user/${props.authorUsername}`}
             className="hover:underline hover:text-foreground transition-colors"
@@ -50,20 +50,23 @@ export function LogCard(props: LogCardProps) {
           <span className="text-muted-foreground">{props.authorName}</span>
           <span>{logDateFormat(props.createdAt)}</span>
         </div>
-        <CardTitle className="text-lg">{props.title}</CardTitle>
+        <CardTitle className="text-lg mt-2">
+          <Link href={props.href} className="before:absolute before:inset-0">
+            {props.title}
+          </Link>
+        </CardTitle>
       </CardHeader>
-      <CardContent className="py-0">
-        <CardDescription>
+      <CardContent className="py-0 relative z-10 pointer-events-none">
+        <CardDescription className="relative h-20 overflow-hidden">
           <LogMdRenderer content={props.preview} showImages={false} />
+          <div className="absolute bottom-0 left-0 w-full h-10 bg-linear-to-t from-card to-transparent pointer-events-none" />
         </CardDescription>
       </CardContent>
-      <CardFooter>
-        <Link
-          href={props.href}
-          className="text-blue-600 hover:underline text-sm font-medium w-fit flex items-center gap-1"
-        >
-          Read log <ArrowRight className="w-4 h-4" />
-        </Link>
+      <CardFooter className="relative z-10 pt-4 pointer-events-none">
+        <div className="text-blue-600 group-hover:underline text-sm font-medium w-fit flex items-center gap-1">
+          Read log{" "}
+          <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+        </div>
       </CardFooter>
     </Card>
   );
