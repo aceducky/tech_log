@@ -1,25 +1,16 @@
 "use client";
 
 import { LogOut } from "lucide-react";
-
-import { authClient } from "@/lib/auth/auth-client";
-import { BetterAuthActionButton } from "./better_auth_action_button";
+import { logoutAction } from "@/app/actions/logout_action";
+import { ActionButton } from "../ui/action-button";
 
 export default function LogoutButton() {
   return (
-    <BetterAuthActionButton
+    <ActionButton
       variant="destructive"
-      action={async () =>
-        await authClient.signOut({
-          fetchOptions: {
-            onSuccess: () => {
-              window.location.href = "/";
-            },
-          },
-        })
-      }
+      action={async () => await logoutAction()}
     >
       <LogOut /> Logout
-    </BetterAuthActionButton>
+    </ActionButton>
   );
 }

@@ -6,7 +6,7 @@ import { BookIcon, LogOutIcon, UserIcon } from "lucide-react";
 import Link from "next/link";
 import { useTransition } from "react";
 import { toast } from "sonner";
-import { authClient } from "@/lib/auth/auth-client";
+import { logoutAction } from "@/app/actions/logout_action";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import {
   DropdownMenu,
@@ -28,14 +28,8 @@ export default function UserButton(props: UserButtonProps) {
 
   const handleLogOut = async () => {
     startLogout(async () => {
-      const { error } = await authClient.signOut({
-        fetchOptions: {
-          onSuccess: () => {
-            window.location.href = "/";
-          },
-        },
-      });
-      if (error) toast.error(error.message ?? "Logout failed");
+      const logOutRes = await logoutAction();
+      if (logOutRes.error) toast.error(logOutRes.message);
     });
   };
 
