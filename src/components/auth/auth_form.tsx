@@ -1,4 +1,3 @@
-import Image from "next/image";
 import type { HTMLAttributes } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Field, FieldGroup } from "@/components/ui/field";
@@ -28,14 +27,26 @@ export default function AuthForm({
               </Field>
             </FieldGroup>
           </div>
-          <div className="relative hidden bg-muted md:block">
-            <Image
-              width={800}
-              height={1200}
-              src="/placeholder.png"
-              alt="Image"
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-            />
+
+          <div className="relative hidden overflow-hidden border-l border-border md:flex">
+            <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-transparent" />
+
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute -right-10 top-8 select-none font-mono text-[10rem] font-bold leading-none text-primary/5"
+            >
+              {"</>"}
+            </span>
+
+            <div className="relative flex flex-1 flex-col items-center justify-center gap-4 p-10 text-center">
+              <h2 className="font-mono text-4xl font-bold tracking-tight">
+                TechLog
+              </h2>
+
+              <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
+                Write it once. Find it later.
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>

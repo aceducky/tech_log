@@ -57,7 +57,7 @@ export default function LandingPage() {
       <section className="px-6 py-24 md:py-32 max-w-5xl mx-auto flex flex-col items-center text-center gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <h1 className="group text-5xl md:text-7xl font-bold tracking-tight text-foreground leading-tight cursor-default">
           The{" "}
-          <span className="transition-colors duration-300 group-hover:text-primary group-hover:shimmer group-hover:shimmer-color-primary">
+          <span className="shimmer shimmer-once shimmer-duration-6000 shimmer-color-primary/10 shimmer-spread-10">
             Logger
           </span>{" "}
           for <br className="hidden md:block" />
