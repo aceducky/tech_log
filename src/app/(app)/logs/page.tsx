@@ -30,7 +30,7 @@ async function LogsFeed({ searchParams }: SearchParamsProps) {
         currentPage={page.currentPage}
         totalPages={page.totalPages}
         sort={page.sort}
-        basePath="/"
+        basePath="/logs"
       />
 
       {page.logs.length === 0 ? (
@@ -54,7 +54,7 @@ async function LogsFeed({ searchParams }: SearchParamsProps) {
         currentPage={page.currentPage}
         totalPages={page.totalPages}
         sort={page.sort}
-        basePath="/"
+        basePath="/logs"
       />
     </>
   );

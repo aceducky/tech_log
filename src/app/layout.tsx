@@ -18,7 +18,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "TechLog",
   description:
-    "Your space for documenting technical knowledge, troubleshooting steps, software discoveries, setup guides, reviews, everything that you want to log about technical things",
+    "A platform for developers to publish technical blogs, tutorials, engineering insights, and searchable technical logs.",
 };
 
 async function UTSSR() {
