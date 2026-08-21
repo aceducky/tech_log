@@ -20,6 +20,7 @@
     "@better-auth/drizzle-adapter": "^1.6.23",
     "@hookform/resolvers": "^5.4.0",
     "@neondatabase/serverless": "^1.1.0",
+    "@shadcn/react": "^0.3.0",
     "@t3-oss/env-nextjs": "^0.13.11",
     "@uiw/react-md-editor": "^4.1.1",
     "@uploadthing/react": "^7.3.3",
