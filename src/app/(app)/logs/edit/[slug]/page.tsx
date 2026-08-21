@@ -1,39 +1,31 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import EditLogForm, {
   EditLogFormSkeleton,
 } from "@/components/log/edit_log_form";
 import { db } from "@/db";
-import { logIdSchema, logTable } from "@/db/schemas/log-schema";
+import { logSlugSchema, logTable } from "@/db/schemas/log-schema";
 import { requireSessionServer } from "@/lib/auth/require_session_server";
-import type { LogIdParams } from "../../types";
+import type { LogSlugParams } from "../../types";
 
-async function EditLogContent({ params }: LogIdParams) {
+async function EditLogContent({ params }: LogSlugParams) {
   const { user } = await requireSessionServer();
-  const { id } = await params;
-  const res = logIdSchema.safeParse(id);
+  const { slug } = await params;
+  const res = logSlugSchema.safeParse(slug);
   if (!res.success) {
-    return notFound();
-  }
-
-  const [row] = await db
-    .select({ dummy: sql<number>`1` })
-    .from(logTable)
-    .where(and(eq(logTable.id, res.data), eq(logTable.authorId, user.id)));
-
-  if (!row) {
     return notFound();
   }
 
   const [log] = await db
     .select({
+      slug: logTable.slug,
       title: logTable.title,
       content: logTable.content,
       coverImgUrl: logTable.coverImgUrl,
     })
     .from(logTable)
-    .where(and(eq(logTable.id, res.data), eq(logTable.authorId, user.id)));
+    .where(and(eq(logTable.slug, res.data), eq(logTable.authorId, user.id)));
 
   if (!log) {
     return notFound();
@@ -41,7 +33,7 @@ async function EditLogContent({ params }: LogIdParams) {
 
   return (
     <EditLogForm
-      id={res.data}
+      slug={log.slug}
       title={log.title}
       content={log.content}
       coverImgUrl={log.coverImgUrl}
@@ -49,7 +41,7 @@ async function EditLogContent({ params }: LogIdParams) {
   );
 }
 
-export default async function Page({ params }: LogIdParams) {
+export default async function Page({ params }: LogSlugParams) {
   return (
     <Suspense fallback={<EditLogFormSkeleton />}>
       <EditLogContent params={params} />

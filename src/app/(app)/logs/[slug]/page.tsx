@@ -1,19 +1,19 @@
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import LogViewer, { LogViewerSkeleton } from "@/components/log/log_viewer";
-import { logIdSchema } from "@/db/schemas/log-schema";
+import { logSlugSchema } from "@/db/schemas/log-schema";
 import { getCurrentSession } from "@/lib/auth/get_current_session";
-import { getLogById } from "@/lib/dal/logs_dal";
+import { getLogBySlug } from "@/lib/dal/logs_dal";
 
-async function LogDetail({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+async function LogDetail({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
 
-  const validationRes = logIdSchema.safeParse(id);
+  const validationRes = logSlugSchema.safeParse(slug);
   if (!validationRes.success) {
     return notFound();
   }
 
-  const res = await getLogById(validationRes.data);
+  const res = await getLogBySlug(validationRes.data);
 
   if (res.error && res.message === "Log not found") {
     return notFound();
@@ -32,7 +32,7 @@ async function LogDetail({ params }: { params: Promise<{ id: string }> }) {
 export default async function Page({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }) {
   return (
     <Suspense fallback={<LogViewerSkeleton />}>

@@ -29,14 +29,14 @@ import CancelButton from "./cancel_btn";
 import { LogMDEditor } from "./log_md_editor";
 
 type EditLogFormProps = {
-  id: Log["id"];
+  slug: Log["slug"];
   title: Log["title"];
   content: Log["content"];
   coverImgUrl: Log["coverImgUrl"];
 };
 
 export default function EditLogForm({
-  id,
+  slug,
   title,
   content,
   coverImgUrl,
@@ -50,7 +50,6 @@ export default function EditLogForm({
     mode: "onTouched",
     resolver: zodResolver(editLogFormSchema),
     defaultValues: {
-      id,
       title,
       content,
       coverImgUrl: coverImgUrl ?? undefined,
@@ -79,22 +78,20 @@ export default function EditLogForm({
 
   async function onSubmit(data: EditLogFormValues) {
     const { dirtyFields } = form.formState;
-    const dirtyData: Record<string, unknown> = { id: data.id };
+    const dirtyData: Record<string, unknown> = {};
     for (const key of Object.keys(
       dirtyFields,
     ) as (keyof typeof dirtyFields)[]) {
-      if (key !== "id") {
-        dirtyData[key] = data[key];
-      }
+      dirtyData[key] = data[key];
     }
 
-    const res = await updateLog(dirtyData);
+    const res = await updateLog({ ...dirtyData, slug });
     if (res.error) {
       toast.error(res.message ?? "Error");
       return;
     }
     if (res.message) toast.success(res.message);
-    router.push(`/logs/${id}`);
+    router.push(`/logs/${slug}`);
   }
 
   return (

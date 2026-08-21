@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import { Toaster } from "sonner";
 import { extractRouterConfig } from "uploadthing/server";
 import { ThemeProvider } from "@/components/theme-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { imgFileRouter } from "./api/uploadthing/core";
 
@@ -47,7 +48,7 @@ export default function RootLayout({
           <Suspense>
             <UTSSR />
           </Suspense>
-          {children}
+          <TooltipProvider>{children}</TooltipProvider>
           <Toaster richColors={true} />
         </ThemeProvider>
       </body>

@@ -65,7 +65,7 @@ async function SearchResults({ searchParams }: SearchParamsProps) {
             createdAt={logDateFormat(log.createdAt)}
             coverImgUrl={log.coverImgUrl}
             preview={generateLogPreview(log.content)}
-            href={`/logs/${log.id}`}
+            href={`/logs/${log.slug}`}
           />
         ))
       )}

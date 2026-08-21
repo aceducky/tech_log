@@ -71,7 +71,7 @@ export default function CreateLogForm() {
     form.reset();
     resetDropzone();
     if (res.message) toast.success(res.message);
-    router.replace(`/logs/${res.data}`);
+    router.replace(`/logs/${res.data.slug}`);
   }
 
   async function handleRemoveCoverImage(

@@ -1,6 +1,6 @@
 import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
-import { logIdSchema } from "@/db/schemas/log-schema";
+import { logSlugSchema } from "@/db/schemas/log-schema";
 
 function isPublicRoute(pathname: string): boolean {
   if (pathname === "/" || pathname === "/logs" || pathname === "/search")
@@ -9,7 +9,11 @@ function isPublicRoute(pathname: string): boolean {
   const segments = pathname.split("/").filter(Boolean);
 
   if (segments.length === 2 && segments[0] === "logs") {
-    return logIdSchema.safeParse(segments[1]).success;
+    return logSlugSchema.safeParse(segments[1]).success;
+  }
+
+  if (segments.length === 2 && segments[0] === "u") {
+    return true;
   }
 
   return false;

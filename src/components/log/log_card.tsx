@@ -16,7 +16,13 @@ import { LogMdRenderer } from "./log_md_renderer";
 
 type LogCardProps = Omit<
   LogWithAuthor,
-  "id" | "authorId" | "createdAt" | "pageViews" | "updatedAt" | "content"
+  | "id"
+  | "slug"
+  | "authorId"
+  | "createdAt"
+  | "pageViews"
+  | "updatedAt"
+  | "content"
 > & {
   href: string;
   preview: string;
@@ -42,7 +48,7 @@ export function LogCard(props: LogCardProps) {
         )}
         <div className="flex items-center gap-2 text-xs text-muted-foreground relative z-20">
           <Link
-            href={`/user/${props.authorUsername}`}
+            href={`/u/${props.authorUsername}`}
             className="hover:underline hover:text-foreground transition-colors"
           >
             @{props.authorUsername}

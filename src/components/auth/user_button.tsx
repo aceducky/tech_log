@@ -52,7 +52,7 @@ export default function UserButton(props: UserButtonProps) {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href={`/user/${props.username}`}>
+            <Link href={`/u/${props.username}`}>
               <BookIcon />
               My Logs
             </Link>

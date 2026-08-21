@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { db } from "@/db";
 import type { Log } from "@/db/schemas/log-schema";
+import { logTable } from "@/db/schemas/log-schema";
 import { logViewsTable } from "@/db/schemas/log-views-schema";
 import sendCelebrationEmail from "@/email/celebration_email";
 import { getCurrentSession } from "@/lib/auth/get_current_session";
@@ -13,9 +14,20 @@ import { Err, Ok, type Result } from "@/lib/result";
 const milestones = new Set([10, 50, 100, 1_000, 10_000, 100_000]);
 
 export async function incrementPageViews(
-  logId: Log["id"],
+  slug: Log["slug"],
 ): Promise<Result<number>> {
   try {
+    const [log] = await db
+      .select({ id: logTable.id })
+      .from(logTable)
+      .where(eq(logTable.slug, slug))
+      .limit(1);
+
+    if (!log) {
+      return Err({ message: "Log not found" });
+    }
+
+    const logId = log.id;
     const session = await getCurrentSession();
     let viewerKey: string;
     if (session?.user.id) {

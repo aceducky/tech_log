@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { LogCard } from "@/components/log/log_card";
 import { LogFeedSkeleton } from "@/components/log/log_feed_skeleton";
@@ -24,6 +25,10 @@ async function UserLogsFeed({
     sort: filters.sort,
   });
 
+  if (result.error && result.message === "User not found") {
+    return notFound();
+  }
+
   if (result.error) {
     throw new Error(result.message);
   }
@@ -33,7 +38,7 @@ async function UserLogsFeed({
     return <div>No logs</div>;
   }
 
-  const basePath = `/user/${username}`;
+  const basePath = `/u/${username}`;
 
   return (
     <div>
@@ -57,7 +62,7 @@ async function UserLogsFeed({
                 createdAt={logDateFormat(log.createdAt)}
                 coverImgUrl={log.coverImgUrl}
                 preview={generateLogPreview(log.content)}
-                href={`/logs/${log.id}`}
+                href={`/logs/${log.slug}`}
               />
             ))}
             <LogPagination
