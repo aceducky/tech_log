@@ -17,26 +17,14 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { MAX_LOG_COVER_IMG_SIZE } from "@/config/constants";
 import {
   type CreateLogFormValues,
   createLogFormSchema,
 } from "@/db/schemas/log-schema";
 import { UploadDropzone } from "@/lib/uploadthing";
+import { getImgUploadErrorMessage } from "@/lib/utils";
 import CancelButton from "./cancel_btn";
 import { LogMDEditor } from "./log_md_editor";
-
-function getCoverUploadErrorMessage(error: Error) {
-  if (error.message.includes("FileSizeMismatch")) {
-    return `Cover image must be ${MAX_LOG_COVER_IMG_SIZE} or smaller.`;
-  }
-
-  if (error.message.includes("Invalid file type")) {
-    return "Please upload a supported image file.";
-  }
-
-  return error.message || "Cover image upload failed. Please try again.";
-}
 
 export default function CreateLogForm() {
   const router = useRouter();
@@ -123,23 +111,6 @@ export default function CreateLogForm() {
                   )}
                 />
                 <Controller
-                  name="content"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name}>Content</FieldLabel>
-                      <LogMDEditor
-                        value={field.value}
-                        onChange={(value) => field.onChange(value ?? "")}
-                        onBlur={field.onBlur}
-                      />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-                <Controller
                   name="coverImgUrl"
                   control={form.control}
                   render={({ field, fieldState }) => {
@@ -157,7 +128,7 @@ export default function CreateLogForm() {
                         {coverImgUrl && coverPreviewUrl ? (
                           <div className="w-full max-w-lg">
                             <div className="aspect-4/3 max-h-80 overflow-hidden rounded-2xl border bg-muted">
-                              {/** biome-ignore lint/performance/noImgElement: temporary for preview, does not need optimizations */}
+                              {/** biome-ignore lint/performance/noImgElement: Blob URLs require a native image element. */}
                               <img
                                 src={coverPreviewUrl}
                                 alt="Uploaded cover preview"
@@ -187,7 +158,6 @@ export default function CreateLogForm() {
                                 replaceCoverPreviewUrl(undefined);
                                 return;
                               }
-
                               replaceCoverPreviewUrl(URL.createObjectURL(file));
                             }}
                             onClientUploadComplete={(res) => {
@@ -196,7 +166,7 @@ export default function CreateLogForm() {
                               field.onChange(fileUrl);
                             }}
                             onUploadError={(error: Error) => {
-                              const message = getCoverUploadErrorMessage(error);
+                              const message = getImgUploadErrorMessage(error);
                               field.onChange(undefined);
                               resetDropzone();
                               toast.error(message);
@@ -206,6 +176,23 @@ export default function CreateLogForm() {
                       </Field>
                     );
                   }}
+                />
+                <Controller
+                  name="content"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name}>Content</FieldLabel>
+                      <LogMDEditor
+                        value={field.value}
+                        onChange={(value) => field.onChange(value ?? "")}
+                        onBlur={field.onBlur}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
                 />
               </FieldGroup>
               <div className="mt-4 flex items-center justify-end gap-4">

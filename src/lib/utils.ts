@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { MAX_IMAGE_SIZE } from "@/config/constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -35,4 +36,14 @@ export function generateLogPreview(content: string, maxLength = 250): string {
   }
 
   return truncated;
+}
+
+export function getImgUploadErrorMessage(error: Error) {
+  if (error.message.includes("FileSizeMismatch")) {
+    return `Image must be ${MAX_IMAGE_SIZE} or smaller.`;
+  }
+  if (error.message.includes("Invalid file type")) {
+    return "Please upload a supported image file.";
+  }
+  return error.message || "Image upload failed. Please try again.";
 }

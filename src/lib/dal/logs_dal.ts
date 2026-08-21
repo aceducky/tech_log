@@ -238,7 +238,7 @@ export async function getLogById(
   }
 }
 
-export async function hasOwnership(
+export async function getOwnership(
   incomingUserId: User["id"],
   incomingLogId: Log["id"],
 ): Promise<Result<{ isOwner: boolean }>> {

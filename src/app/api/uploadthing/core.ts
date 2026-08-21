@@ -1,12 +1,12 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
-import { MAX_LOG_COVER_IMG_SIZE } from "@/config/constants";
+import { MAX_IMAGE_SIZE } from "@/config/constants";
 import { getCurrentSession } from "@/lib/auth/get_current_session";
 
 const f = createUploadthing();
 
 // FileRouter for your app, can contain multiple FileRoutes
-export const coverImgFileRouter = {
+export const imgFileRouter = {
   // Define as many FileRoutes as you like, each with a unique routeSlug
   coverImgUploader: f({
     image: {
@@ -14,7 +14,7 @@ export const coverImgFileRouter = {
        * For full list of options and defaults, see the File Route API reference
        * @see https://docs.uploadthing.com/file-routes#route-config
        */
-      maxFileSize: MAX_LOG_COVER_IMG_SIZE,
+      maxFileSize: MAX_IMAGE_SIZE,
       maxFileCount: 1,
     },
   })
@@ -28,15 +28,24 @@ export const coverImgFileRouter = {
       // Whatever is returned here is accessible in onUploadComplete as `metadata`
       return { userId: session.user.id };
     })
-    .onUploadComplete(async ({ metadata, file }) => {
+    .onUploadComplete(async ({ file }) => {
       // This code RUNS ON YOUR SERVER after upload
-      console.log("Upload complete for userId:", metadata.userId);
-      const fileUrl = file.ufsUrl;
-      console.log("file url", fileUrl);
-
       // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
-      return { fileUrl };
+      return { fileUrl: file.ufsUrl };
     }),
+  contentImageUploader: f({
+    image: {
+      maxFileSize: MAX_IMAGE_SIZE,
+      maxFileCount: 1,
+    },
+  })
+    .middleware(async () => {
+      const session = await getCurrentSession();
+      if (!session) throw new UploadThingError("Unauthorized");
+
+      return { userId: session.user.id };
+    })
+    .onUploadComplete(async ({ file }) => ({ fileUrl: file.ufsUrl })),
 } satisfies FileRouter;
 
-export type coverImgFileRouter = typeof coverImgFileRouter;
+export type imgFileRouter = typeof imgFileRouter;

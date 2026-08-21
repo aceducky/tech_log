@@ -26,12 +26,7 @@ async function LogsFeed({ searchParams }: SearchParamsProps) {
 
   return (
     <>
-      <LogSortControls
-        currentPage={page.currentPage}
-        totalPages={page.totalPages}
-        sort={page.sort}
-        basePath="/logs"
-      />
+      <LogSortControls sort={page.sort} basePath="/logs" />
 
       {page.logs.length === 0 ? (
         <p className="text-muted-foreground">No logs yet.</p>

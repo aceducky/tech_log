@@ -141,7 +141,15 @@
 
 /* React MD Editor styles */
 .w-md-editor {
+  /* biome-ignore lint/complexity/noImportantStyles: md editor styles need !important to override */
+  --md-editor-font-family: var(--font-mono) !important;
+  /* biome-ignore lint/complexity/noImportantStyles: md editor styles need !important to override */
+  font-family: var(--font-mono) !important;
   background-color: hsl(var(--background));
+}
+
+.w-md-editor .wmde-markdown {
+  font-family: var(--font-mono);
 }
 
 .w-md-editor-text-textarea,

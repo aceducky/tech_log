@@ -48,8 +48,6 @@ async function SearchResults({ searchParams }: SearchParamsProps) {
       </div>
 
       <LogSortControls
-        currentPage={page.currentPage}
-        totalPages={page.totalPages}
         sort={page.sort}
         query={filters.query}
         basePath="/search"

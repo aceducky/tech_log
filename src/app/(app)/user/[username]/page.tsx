@@ -47,12 +47,7 @@ async function UserLogsFeed({
           </p>
         ) : (
           <>
-            <LogSortControls
-              currentPage={page.currentPage}
-              totalPages={page.totalPages}
-              sort={page.sort}
-              basePath={basePath}
-            />
+            <LogSortControls sort={page.sort} basePath={basePath} />
             {page.logs.map((log) => (
               <LogCard
                 key={log.id}

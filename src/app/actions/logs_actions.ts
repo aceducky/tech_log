@@ -15,7 +15,7 @@ import {
   GET_LOG_BY_ID_CACHE_TAG,
   GET_LOGS_BY_USERNAME_CACHE_TAG,
   GET_LOGS_CACHE_TAG,
-  hasOwnership,
+  getOwnership,
 } from "@/lib/dal/logs_dal";
 import type { Result } from "@/lib/result";
 import { Err, Ok, ValidationErr } from "@/lib/result";
@@ -53,12 +53,12 @@ export async function updateLog(data: unknown): Promise<Result> {
     return ValidationErr({ zodErr: validated.error });
   }
 
-  const hasOwnershipRes = await hasOwnership(user.id, validated.data.id);
-  if (hasOwnershipRes.error) {
-    return hasOwnershipRes;
+  const getOwnershipRes = await getOwnership(user.id, validated.data.id);
+  if (getOwnershipRes.error) {
+    return getOwnershipRes;
   }
 
-  if (!hasOwnershipRes.data?.isOwner) {
+  if (!getOwnershipRes.data?.isOwner) {
     return Err({ message: "Not authorized to update the log" });
   }
 
@@ -93,12 +93,12 @@ export async function deleteLog(logId: unknown): Promise<Result> {
     return ValidationErr({ message: "Invalid log id" });
   }
 
-  const hasOwnershipRes = await hasOwnership(user.id, validatedId.data);
-  if (hasOwnershipRes.error) {
-    return hasOwnershipRes;
+  const getOwnershipRes = await getOwnership(user.id, validatedId.data);
+  if (getOwnershipRes.error) {
+    return getOwnershipRes;
   }
 
-  if (!hasOwnershipRes.data?.isOwner) {
+  if (!getOwnershipRes.data?.isOwner) {
     return Err({ message: "Not authorized to delete" });
   }
 

@@ -8,7 +8,7 @@ import { Toaster } from "sonner";
 import { extractRouterConfig } from "uploadthing/server";
 import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
-import { coverImgFileRouter } from "./api/uploadthing/core";
+import { imgFileRouter } from "./api/uploadthing/core";
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
@@ -23,9 +23,7 @@ export const metadata: Metadata = {
 
 async function UTSSR() {
   await connection();
-  return (
-    <NextSSRPlugin routerConfig={extractRouterConfig(coverImgFileRouter)} />
-  );
+  return <NextSSRPlugin routerConfig={extractRouterConfig(imgFileRouter)} />;
 }
 
 export default function RootLayout({

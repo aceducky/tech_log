@@ -15,21 +15,20 @@ import {
   type LogsSort,
 } from "@/lib/dal/logs_dal";
 
-type Props = {
-  currentPage: number;
-  totalPages: number;
+type LogSortControlsProps = {
   sort: LogsSort;
   query?: LogsSearchParams["query"];
   basePath: string;
 };
-
+type LogPaginationProps = LogSortControlsProps & {
+  currentPage: number;
+  totalPages: number;
+};
 export function LogSortControls({
-  currentPage,
-  totalPages,
   sort,
   query = "",
   basePath,
-}: Props) {
+}: LogSortControlsProps) {
   return (
     <div className="flex items-center justify-between gap-3">
       <div className="flex items-center gap-3 text-sm">
@@ -57,10 +56,6 @@ export function LogSortControls({
           Oldest
         </Link>
       </div>
-
-      <div className="text-sm text-muted-foreground">
-        Page {currentPage} of {totalPages}
-      </div>
     </div>
   );
 }
@@ -71,7 +66,7 @@ export function LogPagination({
   sort,
   query = "",
   basePath,
-}: Props) {
+}: LogPaginationProps) {
   if (totalPages <= 1) return null;
 
   const items = getPaginationItems(currentPage, totalPages);
