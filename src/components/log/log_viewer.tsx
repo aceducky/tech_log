@@ -10,16 +10,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import type { LogWithAuthor } from "@/lib/dal/logs_dal";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { LogType } from "@/lib/dal/logs_dal";
 import { logDateFormat } from "@/lib/utils";
 import { LogMdRenderer } from "./log_md_renderer";
 import LogOwnerVisibleActions from "./log_owner_visible_actions";
 import PageViews from "./page_views";
 
 type LogViewerProps = {
-  log: LogWithAuthor;
+  log: LogType;
   isOwner?: boolean;
-  pageviews?: number | null;
 };
 
 export default async function LogViewer({
@@ -51,7 +51,12 @@ export default async function LogViewer({
               <div className="flex items-center">
                 <User className="h-4 w-4 mr-1" />
                 <span>
-                  By <span className="font-bold">@{log.authorUsername}</span>{" "}
+                  By{" "}
+                  <span className="font-bold">
+                    <Link href={`/u/${log.authorUsername}`}>
+                      @{log.authorUsername}
+                    </Link>
+                  </span>{" "}
                   {log.authorName}
                 </span>
               </div>
@@ -66,10 +71,10 @@ export default async function LogViewer({
                   </span>
                 )}
               </div>
-              <PageViews logId={log.id} />
+              <PageViews logSlug={log.slug} />
             </div>
 
-            <LogOwnerVisibleActions isOwner={isOwner} logId={log.id} />
+            <LogOwnerVisibleActions isOwner={isOwner} slug={log.slug} />
           </div>
         </div>
       </div>
@@ -100,13 +105,11 @@ export default async function LogViewer({
           </Button>
         </Link>
 
-        <LogOwnerVisibleActions isOwner={isOwner} logId={log.id} />
+        <LogOwnerVisibleActions isOwner={isOwner} slug={log.slug} />
       </div>
     </div>
   );
 }
-
-import { Skeleton } from "@/components/ui/skeleton";
 
 export function LogViewerSkeleton() {
   return (

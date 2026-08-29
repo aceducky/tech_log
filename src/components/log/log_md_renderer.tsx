@@ -5,20 +5,20 @@ import { cn } from "@/lib/utils";
 
 type LogMdRendererProps = {
   content: string;
-  classname?: string;
+  className?: string;
   showImages?: boolean;
 };
 
 export function LogMdRenderer({
   content,
-  classname,
+  className,
   showImages = true,
 }: LogMdRendererProps) {
   return (
     <div
       className={cn(
         "prose prose-stone dark:prose-invert max-w-none",
-        classname,
+        className,
       )}
     >
       <ReactMarkdown
@@ -104,11 +104,14 @@ export function LogMdRenderer({
               return null;
             }
             return (
-              // biome-ignore lint/performance/noImgElement: Standard img tag is necessary here as react-markdown cannot easily provide width/height for next/image
+              // Markdown can contain arbitrary external image URLs, which are not safe to pass through next/image without a strict remotePatterns allowlist.
+              // biome-ignore lint/performance/noImgElement: Render author-provided Markdown images in the browser.
               <img
                 src={src}
                 alt={alt}
                 className="rounded-lg max-w-full h-auto my-4"
+                loading="lazy"
+                decoding="async"
               />
             );
           },

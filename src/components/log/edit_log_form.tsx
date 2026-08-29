@@ -18,35 +18,20 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MAX_LOG_COVER_IMG_SIZE } from "@/config/constants";
 import {
   type EditLogFormValues,
   editLogFormSchema,
   type Log,
 } from "@/db/schemas/log-schema";
 import { UploadDropzone } from "@/lib/uploadthing";
+import { getImgUploadErrorMessage } from "@/lib/utils";
 import CancelButton from "./cancel_btn";
 import { LogMDEditor } from "./log_md_editor";
 
-type EditLogFormProps = {
-  id: Log["id"];
-  title: Log["title"];
-  content: Log["content"];
-  coverImgUrl: Log["coverImgUrl"];
-};
-
-function getCoverUploadErrorMessage(error: Error) {
-  if (error.message.includes("FileSizeMismatch")) {
-    return `Cover image must be ${MAX_LOG_COVER_IMG_SIZE} or smaller.`;
-  }
-  if (error.message.includes("Invalid file type")) {
-    return "Please upload a supported image file.";
-  }
-  return error.message || "Cover image upload failed. Please try again.";
-}
+type EditLogFormProps = Pick<Log, "slug" | "title" | "content" | "coverImgUrl">;
 
 export default function EditLogForm({
-  id,
+  slug,
   title,
   content,
   coverImgUrl,
@@ -60,7 +45,6 @@ export default function EditLogForm({
     mode: "onTouched",
     resolver: zodResolver(editLogFormSchema),
     defaultValues: {
-      id,
       title,
       content,
       coverImgUrl: coverImgUrl ?? undefined,
@@ -89,22 +73,20 @@ export default function EditLogForm({
 
   async function onSubmit(data: EditLogFormValues) {
     const { dirtyFields } = form.formState;
-    const dirtyData: Record<string, unknown> = { id: data.id };
+    const dirtyData: Record<string, unknown> = {};
     for (const key of Object.keys(
       dirtyFields,
     ) as (keyof typeof dirtyFields)[]) {
-      if (key !== "id") {
-        dirtyData[key] = data[key];
-      }
+      dirtyData[key] = data[key];
     }
 
-    const res = await updateLog(dirtyData);
+    const res = await updateLog({ ...dirtyData, slug });
     if (res.error) {
       toast.error(res.message ?? "Error");
       return;
     }
     if (res.message) toast.success(res.message);
-    router.push(`/logs/${id}`);
+    router.push(`/logs/${slug}`);
   }
 
   return (
@@ -134,23 +116,7 @@ export default function EditLogForm({
                   </Field>
                 )}
               />
-              <Controller
-                name="content"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>Content</FieldLabel>
-                    <LogMDEditor
-                      value={field.value ?? ""}
-                      onChange={(value) => field.onChange(value ?? "")}
-                      onBlur={field.onBlur}
-                    />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
+
               <Controller
                 name="coverImgUrl"
                 control={form.control}
@@ -167,7 +133,7 @@ export default function EditLogForm({
                       {showCoverPreview && previewSrc ? (
                         <div className="w-full max-w-lg">
                           <div className="aspect-4/3 max-h-80 overflow-hidden rounded-2xl border bg-muted">
-                            {/** biome-ignore lint/performance/noImgElement: temporary for preview, does not need optimizations */}
+                            {/** biome-ignore lint/performance/noImgElement: Form previews may use blob URLs. */}
                             <img
                               src={previewSrc}
                               alt="Cover preview"
@@ -209,7 +175,7 @@ export default function EditLogForm({
                             setShowCoverPreview(true);
                           }}
                           onUploadError={(error: Error) => {
-                            const message = getCoverUploadErrorMessage(error);
+                            const message = getImgUploadErrorMessage(error);
                             field.onChange(null);
                             resetDropzone();
                             toast.error(message);
@@ -219,6 +185,23 @@ export default function EditLogForm({
                     </Field>
                   );
                 }}
+              />
+              <Controller
+                name="content"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Content</FieldLabel>
+                    <LogMDEditor
+                      value={field.value ?? ""}
+                      onChange={(value) => field.onChange(value ?? "")}
+                      onBlur={field.onBlur}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
               />
             </FieldGroup>
             <div className="mt-4 flex items-center justify-end gap-4">

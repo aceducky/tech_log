@@ -1,6 +1,6 @@
 import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
-import { logIdSchema } from "@/db/schemas/log-schema";
+import { logSlugSchema } from "@/db/schemas/log-schema";
 
 function isPublicRoute(pathname: string): boolean {
   if (pathname === "/" || pathname === "/logs" || pathname === "/search")
@@ -9,7 +9,11 @@ function isPublicRoute(pathname: string): boolean {
   const segments = pathname.split("/").filter(Boolean);
 
   if (segments.length === 2 && segments[0] === "logs") {
-    return logIdSchema.safeParse(segments[1]).success;
+    return logSlugSchema.safeParse(segments[1]).success;
+  }
+
+  if (segments.length === 2 && segments[0] === "u") {
+    return true;
   }
 
   return false;
@@ -40,6 +44,6 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!sign-in|api/auth|api/uploadthing|_next/static|_next/image|favicon\\.ico|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|css|js)$).*)",
+    "/((?!sign-in|api/auth|api/uploadthing|api/chat|api/cron|api/mcp|_next/static|_next/image|favicon\\.ico|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|css|js)$).*)",
   ],
 };

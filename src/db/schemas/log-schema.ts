@@ -1,8 +1,16 @@
 import { type SQL, sql } from "drizzle-orm";
-import { customType, index, pgTable, text, uuid } from "drizzle-orm/pg-core";
+import {
+  customType,
+  index,
+  pgTable,
+  text,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import z from "zod";
 import { MAX_LOG_CONTENT_LEN, MAX_LOG_TITLE_LEN } from "@/config/constants";
+import { MAX_SLUG_LENGTH, SLUG_SUFFIX_LENGTH } from "@/lib/slug";
 import { timestamps } from "../utils/timestamps";
 import { user } from "./auth-schema";
 
@@ -12,16 +20,20 @@ const tsvector = customType<{ data: string }>({
   },
 });
 
+export const RAG_STATUS = ["pending", "done"] as const;
+
 export const logTable = pgTable(
   "log",
   {
     id: uuid("id").defaultRandom().primaryKey(),
+    slug: varchar("slug", { length: MAX_SLUG_LENGTH }).notNull().unique(),
     authorId: text("author_id")
       .notNull()
       .references(() => user.id),
     title: text("title").notNull(),
     content: text("content").notNull(),
     coverImgUrl: text("image_url"),
+    ragStatus: text({ enum: RAG_STATUS }).default("pending").notNull(),
     searchVector: tsvector("search_vector")
       .notNull()
       .generatedAlwaysAs(
@@ -70,10 +82,18 @@ export const createLogFormSchema = createInsertSchema(logTable, {
 
 export type CreateLogFormValues = z.infer<typeof createLogFormSchema>;
 
-export const logIdSchema = z.uuid({ error: "Invalid log ID format." });
+const slugRegex = new RegExp(
+  `^[a-z0-9]+(?:-[a-z0-9]+)*-[a-z0-9]{${SLUG_SUFFIX_LENGTH}}$`,
+);
+
+export const logSlugSchema = z
+  .string()
+  .max(MAX_SLUG_LENGTH, {
+    error: `Slug cannot exceed ${MAX_SLUG_LENGTH} characters.`,
+  })
+  .regex(slugRegex, "Invalid log slug format.");
 
 export const editLogFormSchema = createLogFormSchema.partial().extend({
-  id: logIdSchema,
   coverImgUrl: z
     .url({ error: "Please enter a valid image URL." })
     .trim()
@@ -82,3 +102,9 @@ export const editLogFormSchema = createLogFormSchema.partial().extend({
 });
 
 export type EditLogFormValues = z.infer<typeof editLogFormSchema>;
+
+export const updateLogSchema = editLogFormSchema.extend({
+  slug: logSlugSchema,
+});
+
+export type UpdateLogValues = z.infer<typeof updateLogSchema>;

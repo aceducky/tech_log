@@ -1,20 +1,21 @@
 import z from "zod";
 
-export type Result<T = never> =
-  | { error: false; data?: T; message?: string }
-  | {
-      error: true;
-      message?: string;
-      errors?: Record<string, string[] | undefined>;
-    };
+export type Ok<T = undefined> = { error: false; data: T; message?: string };
+export type Err = {
+  error: true;
+  message: string;
+  errors?: Record<string, string[] | undefined>;
+};
 
-export function Ok<T>({
+export type Result<T = undefined> = Ok<T> | Err;
+
+export function Ok<T = undefined>({
   message,
   data,
 }: {
   message?: string;
-  data?: T;
-}): Result<T> {
+  data: T;
+}): Ok<T> {
   return {
     error: false,
     message,
@@ -22,7 +23,7 @@ export function Ok<T>({
   } as const;
 }
 
-export function Err({ message }: { message: string }): Result {
+export function Err({ message }: { message: string }): Err {
   return {
     error: true,
     message,
@@ -35,7 +36,7 @@ export function ValidationErr<T>({
 }: {
   zodErr?: z.ZodError<T>;
   message?: string;
-}): Result {
+}): Err {
   return {
     error: true,
     message,

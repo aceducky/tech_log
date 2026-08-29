@@ -6,8 +6,7 @@ import {
   LogSortControls,
 } from "@/components/log/log_pagination";
 import { getLogs, parseLogsSearchParams } from "@/lib/dal/logs_dal";
-import { generateLogPreview, logDateFormat } from "@/lib/utils";
-
+import { logDateFormat } from "@/lib/utils";
 import type { SearchParamsProps } from "@/types/search_params";
 
 async function LogsFeed({ searchParams }: SearchParamsProps) {
@@ -26,12 +25,7 @@ async function LogsFeed({ searchParams }: SearchParamsProps) {
 
   return (
     <>
-      <LogSortControls
-        currentPage={page.currentPage}
-        totalPages={page.totalPages}
-        sort={page.sort}
-        basePath="/logs"
-      />
+      <LogSortControls sort={page.sort} basePath="/logs" />
 
       {page.logs.length === 0 ? (
         <p className="text-muted-foreground">No logs yet.</p>
@@ -44,8 +38,8 @@ async function LogsFeed({ searchParams }: SearchParamsProps) {
             authorName={log.authorName}
             createdAt={logDateFormat(log.createdAt)}
             coverImgUrl={log.coverImgUrl}
-            preview={generateLogPreview(log.content)}
-            href={`/logs/${log.id}`}
+            preview={log.preview}
+            href={`/logs/${log.slug}`}
           />
         ))
       )}

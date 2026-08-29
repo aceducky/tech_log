@@ -9,20 +9,20 @@ import { Button } from "../ui/button";
 
 type OwnerVisibleActionsProps = {
   isOwner: boolean;
-  logId: Log["id"];
+  slug: Log["slug"];
   className?: string;
 };
 
 export default function LogOwnerVisibleActions({
   isOwner,
-  logId,
+  slug,
   className,
 }: OwnerVisibleActionsProps) {
   if (!isOwner) return null;
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <Link href={`/logs/edit/${logId}`}>
+      <Link href={`/logs/edit/${slug}`}>
         <Button variant="outline">
           <Edit className="mr-2 h-4 w-4" />
           Edit Log
@@ -36,7 +36,7 @@ export default function LogOwnerVisibleActions({
         areYouSureDescription="This will permanently delete this log. This action cannot be undone."
         action={async () => {
           "use server";
-          const res = await deleteLog(logId);
+          const res = await deleteLog(slug);
 
           if (!res.error) redirect("/logs");
 

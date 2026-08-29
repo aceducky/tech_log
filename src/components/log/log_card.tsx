@@ -10,13 +10,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { LogWithAuthor } from "@/lib/dal/logs_dal";
+import type { LogCardType } from "@/lib/dal/logs_dal";
 import { logDateFormat } from "@/lib/utils";
 import { LogMdRenderer } from "./log_md_renderer";
 
-type LogCardProps = Omit<
-  LogWithAuthor,
-  "id" | "authorId" | "createdAt" | "pageViews" | "updatedAt" | "content"
+type LogCardProps = Pick<
+  LogCardType,
+  "title" | "coverImgUrl" | "authorUsername" | "authorName"
 > & {
   href: string;
   preview: string;
@@ -42,7 +42,7 @@ export function LogCard(props: LogCardProps) {
         )}
         <div className="flex items-center gap-2 text-xs text-muted-foreground relative z-20">
           <Link
-            href={`/user/${props.authorUsername}`}
+            href={`/u/${props.authorUsername}`}
             className="hover:underline hover:text-foreground transition-colors"
           >
             @{props.authorUsername}

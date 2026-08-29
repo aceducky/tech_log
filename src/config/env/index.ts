@@ -10,6 +10,11 @@ export const env = createEnv({
     BETTER_AUTH_URL: z.url(),
     RESEND_API_KEY: z.string().min(1),
     DEMO_RECEIVER_EMAIL: z.email(),
+    CHAT_MODEL: z.string().min(1),
+    AI_API_KEY: z.string().min(1),
+    EMBEDDING_MODEL: z.string().min(1),
+    CF_ACCOUNT_ID: z.string().min(1),
+    CRON_SECRET: z.string().min(1),
   },
   client: {
     NEXT_PUBLIC_BETTER_AUTH_URL: z.url(),
@@ -23,5 +28,10 @@ export const env = createEnv({
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     DEMO_RECEIVER_EMAIL: process.env.DEMO_RECEIVER_EMAIL,
     NEXT_PUBLIC_BETTER_AUTH_URL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL,
+    CF_ACCOUNT_ID: process.env.CF_ACCOUNT_ID,
+    AI_API_KEY: process.env.AI_API_KEY,
+    CHAT_MODEL: process.env.CHAT_MODEL,
+    EMBEDDING_MODEL: process.env.EMBEDDING_MODEL,
+    CRON_SECRET: process.env.CRON_SECRET,
   },
 });

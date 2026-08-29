@@ -5,6 +5,6 @@ export const ClientOnlyMDEditor = dynamic(
   () => import("@uiw/react-md-editor"),
   {
     ssr: false,
-    loading: () => <Skeleton className="h-[200px] w-full rounded-md" />,
+    loading: () => <Skeleton className="h-50 w-full rounded-md" />,
   },
 );

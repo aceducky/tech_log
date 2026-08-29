@@ -4,7 +4,7 @@
 
 @import "uploadthing/tw/v4";
 @source "../../node_modules/@uploadthing/react/dist";
-
+@source "../../node_modules/streamdown/dist/*.js";
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -141,7 +141,15 @@
 
 /* React MD Editor styles */
 .w-md-editor {
+  /* biome-ignore lint/complexity/noImportantStyles: md editor styles need !important to override */
+  --md-editor-font-family: var(--font-mono) !important;
+  /* biome-ignore lint/complexity/noImportantStyles: md editor styles need !important to override */
+  font-family: var(--font-mono) !important;
   background-color: hsl(var(--background));
+}
+
+.w-md-editor .wmde-markdown {
+  font-family: var(--font-mono);
 }
 
 .w-md-editor-text-textarea,
@@ -178,4 +186,14 @@ input[type="search"]::-ms-clear {
   display: none;
   width: 0;
   height: 0;
+}
+
+/* Ensure modal overlays and toasts appear above fullscreen editor (z-index: 99999) */
+[data-slot="dialog-portal"]:has([data-slot="dialog-content"].z-\[100001\])
+  [data-slot="dialog-overlay"] {
+  z-index: 100000;
+}
+
+[data-sonner-toaster] {
+  z-index: 100002;
 }

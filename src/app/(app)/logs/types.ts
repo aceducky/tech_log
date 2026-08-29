@@ -1,5 +1,5 @@
-export type LogIdParams = {
+export type LogSlugParams = {
   params: Promise<{
-    id: string;
+    slug: string;
   }>;
 };

@@ -11,15 +11,18 @@ import {
   Text,
 } from "react-email";
 
+import type { Log } from "@/db/schemas/log-schema";
+import type { DbUser } from "@/lib/auth/types";
+
 type Props = {
-  name: string;
-  pageviews: number;
-  logTitle: string;
+  name: DbUser["name"];
+  pageViews: number;
+  logTitle: Log["title"];
   logUrl: string;
 };
 
-const CelebrationTemplate = ({ name, pageviews, logTitle, logUrl }: Props) => {
-  const previewText = `Your log just hit ${pageviews} views`;
+const CelebrationTemplate = ({ name, pageViews, logTitle, logUrl }: Props) => {
+  const previewText = `Your log just hit ${pageViews} views`;
 
   return (
     <Html>
@@ -33,7 +36,7 @@ const CelebrationTemplate = ({ name, pageviews, logTitle, logUrl }: Props) => {
             <Heading style={heading}>Congrats, {name}!</Heading>
 
             <Text style={paragraph}>
-              Your log "{logTitle}" just hit <strong>{pageviews}</strong> views.
+              Your log "{logTitle}" just hit <strong>{pageViews}</strong> views.
               Turns out people like you. Well, your log. Probably you too.
             </Text>
 

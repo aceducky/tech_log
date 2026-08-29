@@ -1,3 +1,4 @@
+import { AskAiShell } from "@/components/ask_ai_shell";
 import { Navbar } from "@/components/navbar";
 
 export default function AppLayout({
@@ -5,10 +6,5 @@ export default function AppLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <>
-      <Navbar />
-      {children}
-    </>
-  );
+  return <AskAiShell navbar={<Navbar />}>{children}</AskAiShell>;
 }
