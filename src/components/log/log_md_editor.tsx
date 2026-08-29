@@ -9,13 +9,17 @@ import { Upload } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useMemo, useRef, useState } from "react";
 import rehypeSanitize from "rehype-sanitize";
+import { toast } from "sonner";
 import { ClientOnlyMDEditor } from "@/components/client_only_mdeditor";
 import {
-  Popover,
-  PopoverAnchor,
-  PopoverContent,
-} from "@/components/ui/popover";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { UploadDropzone } from "@/lib/uploadthing";
+import { getImgUploadErrorMessage } from "@/lib/utils";
 
 type LogMDEditorProps = {
   value: string;
@@ -51,45 +55,53 @@ export function LogMDEditor({ value, onChange, onBlur }: LogMDEditorProps) {
   );
 
   return (
-    <Popover open={isImageUploadOpen} onOpenChange={setIsImageUploadOpen}>
-      <PopoverAnchor asChild>
-        <div>
-          <ClientOnlyMDEditor
-            value={value}
-            onChange={onChange}
-            onBlur={onBlur}
-            previewOptions={{
-              rehypePlugins: [[rehypeSanitize]],
-            }}
-            autoCapitalize="off"
-            autoCorrect="off"
-            data-color-mode={resolvedTheme === "dark" ? "dark" : "light"}
-            textareaProps={{
-              placeholder: "Write your content in markdown",
-            }}
-            commands={commands
-              .getCommands()
-              .map((command) =>
-                command.keyCommand === "image" ? imageUploadCommand : command,
-              )}
-          />
-        </div>
-      </PopoverAnchor>
-      <PopoverContent align="start" className="w-96">
-        <UploadDropzone
-          endpoint="contentImageUploader"
-          onClientUploadComplete={(res) => {
-            const imageUrl = res[0]?.ufsUrl;
-            const imageInsertion = imageInsertionRef.current;
-            if (!imageUrl || !imageInsertion) return;
+    <>
+      <ClientOnlyMDEditor
+        value={value}
+        onChange={onChange}
+        onBlur={onBlur}
+        previewOptions={{
+          rehypePlugins: [[rehypeSanitize]],
+        }}
+        autoCapitalize="off"
+        autoCorrect="off"
+        data-color-mode={resolvedTheme === "dark" ? "dark" : "light"}
+        textareaProps={{
+          placeholder: "Write your content in markdown",
+        }}
+        commands={commands
+          .getCommands()
+          .map((command) =>
+            command.keyCommand === "image" ? imageUploadCommand : command,
+          )}
+      />
+      <Dialog open={isImageUploadOpen} onOpenChange={setIsImageUploadOpen}>
+        <DialogContent className="z-100001 sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Upload Image</DialogTitle>
+            <DialogDescription>
+              Upload an image to insert it into your markdown content.
+            </DialogDescription>
+          </DialogHeader>
+          <UploadDropzone
+            endpoint="contentImageUploader"
+            onClientUploadComplete={(res) => {
+              const imageUrl = res[0]?.ufsUrl;
+              const imageInsertion = imageInsertionRef.current;
+              if (!imageUrl || !imageInsertion) return;
 
-            imageInsertion.api.setSelectionRange(imageInsertion.selection);
-            imageInsertion.api.replaceSelection(`![image](${imageUrl})`);
-            imageInsertionRef.current = null;
-            setIsImageUploadOpen(false);
-          }}
-        />
-      </PopoverContent>
-    </Popover>
+              imageInsertion.api.setSelectionRange(imageInsertion.selection);
+              imageInsertion.api.replaceSelection(`![image](${imageUrl})`);
+              imageInsertionRef.current = null;
+              setIsImageUploadOpen(false);
+            }}
+            onUploadError={(error: Error) => {
+              const message = getImgUploadErrorMessage(error);
+              toast.error(message);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

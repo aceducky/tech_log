@@ -16,9 +16,9 @@ export default function PageViews({ logSlug }: PageViewsProps) {
       if (res.error) {
         return;
       }
-      setLocalPageViews(res.data ?? "-");
+      setLocalPageViews(res.data);
     }
     incrementViews();
   }, [logSlug]);
-  return <PageViewsBadge pageviews={localPageViews} />;
+  return <PageViewsBadge pageViews={localPageViews} />;
 }

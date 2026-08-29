@@ -2,6 +2,7 @@
 
 import { eq } from "drizzle-orm";
 import { updateTag } from "next/cache";
+import { after } from "next/server";
 import { db } from "@/db";
 import {
   createLogFormSchema,
@@ -10,6 +11,7 @@ import {
   logTable,
   updateLogSchema,
 } from "@/db/schemas/log-schema";
+import { generateAndStoreEmbeddings } from "@/lib/ai/embedding";
 import { requireSessionServer } from "@/lib/auth/require_session_server";
 import {
   getLogBySlugCacheTag,
@@ -53,6 +55,12 @@ export async function createLog(
       updateTag(getLogsCacheTag());
       updateTag(getLogsByUsernameCacheTag(user.username));
 
+      after(() => {
+        generateAndStoreEmbeddings({
+          content: validated.data.content,
+          logId: res.id,
+        });
+      });
       return Ok({ message: "Created log successfully", data: res });
     } catch (err) {
       console.error(err);
@@ -73,27 +81,52 @@ export async function updateLog(data: unknown): Promise<Result> {
 
   const { slug, ...update } = validated.data;
 
-  const getOwnershipRes = await getOwnershipBySlug(user.id, slug);
+  const getOwnershipRes = await getOwnershipBySlug({
+    incomingUserId: user.id,
+    slug: slug,
+  });
   if (getOwnershipRes.error) {
     return getOwnershipRes;
   }
 
-  if (!getOwnershipRes.data?.isOwner) {
+  if (!getOwnershipRes.data.isOwner) {
     return Err({ message: "Not authorized to update the log" });
   }
 
   if (Object.keys(update).length === 0) {
-    return Ok({ message: "No changes to update" });
+    return Ok({ data: undefined, message: "No changes to update" });
   }
 
   try {
-    await db.update(logTable).set(update).where(eq(logTable.slug, slug));
+    const updatedContent = update.content;
+
+    const updateData = {
+      ...update,
+      ...(updatedContent !== undefined
+        ? { ragStatus: "pending" as const }
+        : {}),
+    };
+
+    const [{ id: logId }] = await db
+      .update(logTable)
+      .set(updateData)
+      .where(eq(logTable.slug, slug))
+      .returning({ id: logTable.id });
 
     updateTag(getLogsCacheTag());
     updateTag(getLogBySlugCacheTag(slug));
     updateTag(getLogsByUsernameCacheTag(user.username));
 
-    return Ok({ message: "Log is updated" });
+    if (updatedContent !== undefined) {
+      after(() => {
+        generateAndStoreEmbeddings({
+          content: updatedContent,
+          logId,
+        });
+      });
+    }
+
+    return Ok({ data: undefined, message: "Log is updated" });
   } catch (err) {
     console.error(err);
     return Err({ message: "Couldn't update log" });
@@ -108,12 +141,15 @@ export async function deleteLog(slug: unknown): Promise<Result> {
     return ValidationErr({ message: "Invalid log slug" });
   }
 
-  const getOwnershipRes = await getOwnershipBySlug(user.id, validatedSlug.data);
+  const getOwnershipRes = await getOwnershipBySlug({
+    incomingUserId: user.id,
+    slug: validatedSlug.data,
+  });
   if (getOwnershipRes.error) {
     return getOwnershipRes;
   }
 
-  if (!getOwnershipRes.data?.isOwner) {
+  if (!getOwnershipRes.data.isOwner) {
     return Err({ message: "Not authorized to delete" });
   }
 
@@ -124,7 +160,7 @@ export async function deleteLog(slug: unknown): Promise<Result> {
     updateTag(getLogBySlugCacheTag(validatedSlug.data));
     updateTag(getLogsByUsernameCacheTag(user.username));
 
-    return Ok({ message: "Log is deleted" });
+    return Ok({ data: undefined, message: "Log is deleted" });
   } catch (err) {
     console.error(err);
     return Err({ message: "Couldn't delete log" });

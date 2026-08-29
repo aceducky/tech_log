@@ -19,7 +19,7 @@ async function LogDetail({ params }: { params: Promise<{ slug: string }> }) {
     return notFound();
   }
 
-  if (res.error || !res.data) {
+  if (res.error) {
     throw new Error(res.message);
   }
 

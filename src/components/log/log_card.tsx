@@ -10,19 +10,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { LogWithAuthor } from "@/lib/dal/logs_dal";
+import type { LogCardType } from "@/lib/dal/logs_dal";
 import { logDateFormat } from "@/lib/utils";
 import { LogMdRenderer } from "./log_md_renderer";
 
-type LogCardProps = Omit<
-  LogWithAuthor,
-  | "id"
-  | "slug"
-  | "authorId"
-  | "createdAt"
-  | "pageViews"
-  | "updatedAt"
-  | "content"
+type LogCardProps = Pick<
+  LogCardType,
+  "title" | "coverImgUrl" | "authorUsername" | "authorName"
 > & {
   href: string;
   preview: string;

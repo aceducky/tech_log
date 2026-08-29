@@ -3,20 +3,20 @@ import { cn } from "@/lib/utils";
 import { Badge } from "../ui/badge";
 
 export default function PageViewsBadge({
-  pageviews,
-  classname,
+  pageViews,
+  className,
 }: {
-  pageviews: number | string;
-  classname?: string;
+  pageViews: number | string;
+  className?: string;
 }) {
   return (
     <Badge
       variant="secondary"
-      className={cn("text-sm text-muted-foreground", classname)}
+      className={cn("text-sm text-muted-foreground", className)}
       aria-label="page views"
     >
       <Eye className="h-4 w-4" />
-      {pageviews} {pageviews === 1 ? "view" : "views"}
+      {pageViews} {pageViews === 1 ? "view" : "views"}
     </Badge>
   );
 }

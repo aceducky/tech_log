@@ -26,25 +26,46 @@ export type LogsSort = LogsSearchParams["sort"];
 export type PaginationItem = number | "ellipsis";
 export type LogsListInput = Pick<LogsSearchParams, "page" | "sort">;
 
-export type LogWithAuthor = Omit<Log, "authorId" | "searchVector"> & {
+export type BaseLog = Omit<
+  Log,
+  "authorId" | "searchVector" | "ragStatus" | "content"
+> & {
   authorId: DbUser["id"];
   authorName: DbUser["name"];
   authorUsername: DbUser["username"];
+  pageViews: number;
+};
+
+export type LogCardType = BaseLog & {
+  preview: string;
+};
+
+export type LogType = BaseLog & {
+  content: string;
 };
 
 export type LogsPage = {
-  logs: LogWithAuthor[];
+  logs: LogCardType[];
   currentPage: number;
   totalPages: number;
   totalLogs: number;
   sort: LogsSort;
 };
 
-const logWithAuthorSelect = {
+export type AiLogSearchResult = Pick<
+  BaseLog,
+  "slug" | "title" | "authorName" | "authorUsername" | "createdAt" | "updatedAt"
+>;
+
+export type AiLogsSearchResult = {
+  logs: AiLogSearchResult[];
+  totalLogs: number;
+};
+
+const baselogSelect = {
   id: logTable.id,
   slug: logTable.slug,
   title: logTable.title,
-  content: logTable.content,
   authorId: logTable.authorId,
   authorUsername: user.username,
   authorName: user.name,
@@ -52,6 +73,16 @@ const logWithAuthorSelect = {
   updatedAt: logTable.updatedAt,
   pageViews: db.$count(logViewsTable, eq(logViewsTable.logId, logTable.id)),
   coverImgUrl: logTable.coverImgUrl,
+};
+const PREVIEW_CHARACTERS_LIMIT = 300;
+const logCardSelect = {
+  preview: sql<string>`left(${logTable.content}, ${PREVIEW_CHARACTERS_LIMIT})`,
+  ...baselogSelect,
+};
+
+const logSelect = {
+  content: logTable.content,
+  ...baselogSelect,
 };
 
 function getFirstSearchParam(value: string | string[] | undefined) {
@@ -142,7 +173,7 @@ export async function getLogs(input: LogsListInput): Promise<Result<LogsPage>> {
     );
 
     const logs = await db
-      .select(logWithAuthorSelect)
+      .select(logCardSelect)
       .from(logTable)
       .innerJoin(user, eq(logTable.authorId, user.id))
       .orderBy(...getSortOrder(input.sort))
@@ -192,7 +223,7 @@ export async function searchLogs(
     );
 
     const logs = await db
-      .select(logWithAuthorSelect)
+      .select(logCardSelect)
       .from(logTable)
       .innerJoin(user, eq(logTable.authorId, user.id))
       .where(matchesSearch)
@@ -215,15 +246,53 @@ export async function searchLogs(
   }
 }
 
+export async function searchLogsForAi(
+  query: string,
+  limit = 10,
+): Promise<Result<AiLogsSearchResult>> {
+  const trimmedQuery = query.trim();
+
+  if (!trimmedQuery) {
+    return Ok({ data: { logs: [], totalLogs: 0 } });
+  }
+
+  try {
+    const tsQuery = sql`websearch_to_tsquery('english', ${trimmedQuery})`;
+    const matchesSearch = sql`${logTable.searchVector} @@ ${tsQuery}`;
+    const rank = sql<number>`ts_rank(${logTable.searchVector}, ${tsQuery})`;
+    const totalLogs = await db.$count(logTable, matchesSearch);
+
+    const logs = await db
+      .select({
+        slug: logTable.slug,
+        title: logTable.title,
+        authorName: user.name,
+        authorUsername: user.username,
+        createdAt: logTable.createdAt,
+        updatedAt: logTable.updatedAt,
+      })
+      .from(logTable)
+      .innerJoin(user, eq(logTable.authorId, user.id))
+      .where(matchesSearch)
+      .orderBy(desc(rank), desc(logTable.createdAt), desc(logTable.id))
+      .limit(limit);
+
+    return Ok({ data: { logs, totalLogs } });
+  } catch (err) {
+    console.error(err);
+    return Err({ message: "Couldn't search logs for AI" });
+  }
+}
+
 export async function getLogBySlug(
   slug: Log["slug"],
-): Promise<Result<LogWithAuthor>> {
+): Promise<Result<LogType>> {
   "use cache";
   cacheLife("minutes");
   cacheTag(getLogBySlugCacheTag(slug));
   try {
     const [row] = await db
-      .select(logWithAuthorSelect)
+      .select(logSelect)
       .from(logTable)
       .innerJoin(user, eq(logTable.authorId, user.id))
       .where(eq(logTable.slug, slug));
@@ -239,10 +308,13 @@ export async function getLogBySlug(
   }
 }
 
-export async function getOwnershipBySlug(
-  incomingUserId: User["id"],
-  slug: Log["slug"],
-): Promise<Result<{ isOwner: boolean }>> {
+export async function getOwnershipBySlug({
+  incomingUserId,
+  slug,
+}: {
+  incomingUserId: User["id"];
+  slug: Log["slug"];
+}): Promise<Result<{ isOwner: boolean }>> {
   try {
     const [row] = await db
       .select({ authorId: logTable.authorId })
@@ -288,7 +360,7 @@ export async function getLogsByUsername(
     );
 
     const logs = await db
-      .select(logWithAuthorSelect)
+      .select(logCardSelect)
       .from(logTable)
       .innerJoin(user, eq(logTable.authorId, user.id))
       .where(userFilter)

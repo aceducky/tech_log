@@ -63,7 +63,7 @@ export default function CreateLogForm() {
 
   async function onSubmit(data: CreateLogFormValues) {
     const res = await createLog(data);
-    if (res.error || !res.data) {
+    if (res.error) {
       toast.error(res.message ?? "Error");
       return;
     }

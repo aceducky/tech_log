@@ -20,6 +20,8 @@ const tsvector = customType<{ data: string }>({
   },
 });
 
+export const RAG_STATUS = ["pending", "done"] as const;
+
 export const logTable = pgTable(
   "log",
   {
@@ -31,6 +33,7 @@ export const logTable = pgTable(
     title: text("title").notNull(),
     content: text("content").notNull(),
     coverImgUrl: text("image_url"),
+    ragStatus: text({ enum: RAG_STATUS }).default("pending").notNull(),
     searchVector: tsvector("search_vector")
       .notNull()
       .generatedAlwaysAs(

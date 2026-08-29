@@ -7,7 +7,7 @@ import {
 } from "@/components/log/log_pagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import { parseLogsSearchParams, searchLogs } from "@/lib/dal/logs_dal";
-import { generateLogPreview, logDateFormat } from "@/lib/utils";
+import { logDateFormat } from "@/lib/utils";
 import type { SearchParamsProps } from "@/types/search_params";
 
 async function SearchResults({ searchParams }: SearchParamsProps) {
@@ -64,7 +64,7 @@ async function SearchResults({ searchParams }: SearchParamsProps) {
             authorName={log.authorName}
             createdAt={logDateFormat(log.createdAt)}
             coverImgUrl={log.coverImgUrl}
-            preview={generateLogPreview(log.content)}
+            preview={log.preview}
             href={`/logs/${log.slug}`}
           />
         ))

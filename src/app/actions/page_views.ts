@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { db } from "@/db";
 import type { Log } from "@/db/schemas/log-schema";
-import { logTable } from "@/db/schemas/log-schema";
+import { logSlugSchema, logTable } from "@/db/schemas/log-schema";
 import { logViewsTable } from "@/db/schemas/log-views-schema";
 import sendCelebrationEmail from "@/email/celebration_email";
 import { getCurrentSession } from "@/lib/auth/get_current_session";
@@ -14,8 +14,16 @@ import { Err, Ok, type Result } from "@/lib/result";
 const milestones = new Set([10, 50, 100, 1_000, 10_000, 100_000]);
 
 export async function incrementPageViews(
-  slug: Log["slug"],
+  incomingSlug: Log["slug"],
 ): Promise<Result<number>> {
+  const validatedSlug = logSlugSchema.safeParse(incomingSlug);
+
+  if (!validatedSlug.success) {
+    return Err({ message: "Invalid log slug" });
+  }
+
+  const slug = validatedSlug.data;
+
   try {
     const [log] = await db
       .select({ id: logTable.id })

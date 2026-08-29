@@ -5,20 +5,20 @@ import { cn } from "@/lib/utils";
 
 type LogMdRendererProps = {
   content: string;
-  classname?: string;
+  className?: string;
   showImages?: boolean;
 };
 
 export function LogMdRenderer({
   content,
-  classname,
+  className,
   showImages = true,
 }: LogMdRendererProps) {
   return (
     <div
       className={cn(
         "prose prose-stone dark:prose-invert max-w-none",
-        classname,
+        className,
       )}
     >
       <ReactMarkdown

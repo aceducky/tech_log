@@ -10,16 +10,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import type { LogWithAuthor } from "@/lib/dal/logs_dal";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { LogType } from "@/lib/dal/logs_dal";
 import { logDateFormat } from "@/lib/utils";
 import { LogMdRenderer } from "./log_md_renderer";
 import LogOwnerVisibleActions from "./log_owner_visible_actions";
 import PageViews from "./page_views";
 
 type LogViewerProps = {
-  log: LogWithAuthor;
+  log: LogType;
   isOwner?: boolean;
-  pageviews?: number | null;
 };
 
 export default async function LogViewer({
@@ -110,8 +110,6 @@ export default async function LogViewer({
     </div>
   );
 }
-
-import { Skeleton } from "@/components/ui/skeleton";
 
 export function LogViewerSkeleton() {
   return (

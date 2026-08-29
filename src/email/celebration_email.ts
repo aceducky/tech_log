@@ -13,57 +13,63 @@ type SendCelebrationEmailProps = {
 export default async function sendCelebrationEmail(
   props: SendCelebrationEmailProps,
 ) {
-  const [row] = await db
-    .select({
-      email: user.email,
-      userId: user.id,
-      name: user.name,
-      title: logTable.title,
-    })
-    .from(logTable)
-    .innerJoin(user, eq(logTable.authorId, user.id))
-    .where(eq(logTable.id, props.logId));
+  try {
+    const [userLog] = await db
+      .select({
+        email: user.email,
+        userId: user.id,
+        name: user.name,
+        title: logTable.title,
+      })
+      .from(logTable)
+      .innerJoin(user, eq(logTable.authorId, user.id))
+      .where(eq(logTable.id, props.logId))
+      .limit(1);
 
-  if (!row) {
-    console.error("Log not found");
-    return;
-  }
-  const { userId, email, name, title } = row;
+    if (!userLog) {
+      console.error("Log not found");
+      return;
+    }
 
-  if (!email) {
-    console.log(
-      "Email not found for user",
-      userId,
-      "skipping celebratory email",
-    );
-    return;
-  }
+    const { userId, email, name, title } = userLog;
 
-  const logUrl = `https://techloggers.vercel.app/logs/${props.logId}`;
+    if (!email) {
+      console.log(
+        "Email not found for user",
+        userId,
+        "skipping celebratory email",
+      );
+      return;
+    }
 
-  const emailRes = await resend.emails.send({
-    from: "TechLog <onboarding@resend.dev>",
-    to: env.DEMO_RECEIVER_EMAIL,
-    subject: `🎉Congrats, your log hit ${props.pageViews} views`,
-    react: CelebrationTemplate({
-      name,
-      pageviews: props.pageViews,
-      logTitle: title,
-      logUrl,
-    }),
-  });
-  if (emailRes.error) {
-    console.error("Failed to send celebratory email.", {
-      userId,
-      logId: props.logId,
-      pageViews: props.pageViews,
-      error: emailRes.error,
+    const logUrl = `https://techloggers.vercel.app/logs/${props.logId}`;
+
+    const emailRes = await resend.emails.send({
+      from: "TechLog <onboarding@resend.dev>",
+      to: env.DEMO_RECEIVER_EMAIL,
+      subject: `🎉Congrats, your log hit ${props.pageViews} views`,
+      react: CelebrationTemplate({
+        name,
+        pageViews: props.pageViews,
+        logTitle: title,
+        logUrl,
+      }),
     });
-  } else {
-    console.log("Successfully sent celebratory email.", {
-      userId,
-      logId: props.logId,
-      pageViews: props.pageViews,
-    });
+    if (emailRes.error) {
+      console.error("Failed to send celebratory email.", {
+        userId,
+        logId: props.logId,
+        pageViews: props.pageViews,
+        error: emailRes.error,
+      });
+    } else {
+      console.log("Successfully sent celebratory email.", {
+        userId,
+        logId: props.logId,
+        pageViews: props.pageViews,
+      });
+    }
+  } catch (e) {
+    console.error("Error while getting log user data or sending email", e);
   }
 }

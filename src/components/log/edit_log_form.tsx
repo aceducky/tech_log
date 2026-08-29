@@ -28,12 +28,7 @@ import { getImgUploadErrorMessage } from "@/lib/utils";
 import CancelButton from "./cancel_btn";
 import { LogMDEditor } from "./log_md_editor";
 
-type EditLogFormProps = {
-  slug: Log["slug"];
-  title: Log["title"];
-  content: Log["content"];
-  coverImgUrl: Log["coverImgUrl"];
-};
+type EditLogFormProps = Pick<Log, "slug" | "title" | "content" | "coverImgUrl">;
 
 export default function EditLogForm({
   slug,
