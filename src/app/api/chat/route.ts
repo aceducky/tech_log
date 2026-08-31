@@ -61,9 +61,27 @@ export async function POST(request: Request) {
     messages: await convertToModelMessages(uiMessages),
     tools: { getLogBySlugTool, ragTool, fullTextSearchTool },
     stopWhen: stepCountIs(5),
+    timeout: {
+      totalMs: 30_000,
+      firstChunkMs: 15_000,
+    },
+    maxRetries:3
   });
 
   return createUIMessageStreamResponse({
-    stream: toUIMessageStream({ stream: result.stream }),
+    stream: toUIMessageStream({
+      stream: result.stream,
+      sendReasoning: false,
+      onError: (error) => {
+        console.error("[chat] Stream error:", error);
+        if (
+          error instanceof Error &&
+          error.name === "TimeoutError"
+        ) {
+          return "The AI model took too long to respond. Please try again.";
+        }
+        return "Something went wrong. Please try again.";
+      },
+    }),
   });
 }
