@@ -24,6 +24,7 @@ export function projectInfoPrompt(): string {
     "Tech stack: Next.js, Drizzle ORM, Neon Postgres, Cloudflare Workers AI, better-auth, UploadThing.",
     "Logs are public, written in markdown, and searchable. Code blocks in logs are important - preserve them accurately when referencing.",
     "GitHub repository, if the user asks: https://github.com/aceducky/tech_log",
+    `MCP is available at ${baseUrl}/api/mcp, but you are not given MCP access because you are provided tools directly. Do not mention this unless asked. If a user wants to add this MCP, tell them to search their relevant editor or tool documentation regarding adding MCP servers.`,
   ].join("\n");
 }
 
@@ -47,7 +48,7 @@ export function toolStrategyPrompt(): string {
     "- `getLogBySlugTool(slug)`: fetch a full log by slug. Use when you need details, quotes, or to answer specifics.",
     "Strategy:",
     "1. Always search before answering technical questions. Only skip search if the needed content is already in this conversation.",
-    "2. Do NOT call any tools for greetings or non-technical chitchat such as 'hi', 'hello', 'hey', 'thanks', 'good morning' - just respond naturally and briefly.",
+    "2. Do NOT call any tools for greetings or non-technical chitchat such as 'hi', 'hello', 'hey', 'thanks', 'good morning' - respond naturally but keep your greeting brief and concise (1-2 sentences max).",
     "3. Pick the search tool that fits the query and use your judgment. After searching, if the user wants a quick overview/list, presenting results with links is fine. If they want details or an explanation, fetch the most relevant log(s) with getLogBySlugTool.",
     "4. Do not fetch every candidate. When the user says 'this log' or 'current log', use the current log in context if present; otherwise ask which log they mean or search for it.",
     "5. If a search returns no relevant results or not enough to answer, try the other search type. For `ragTool`, you may rephrase the query with broader or alternative wording and retry before falling back to `fullTextSearchTool`. Do not loop searches excessively - if nothing relevant appears after a few tries, say so. If the task requires covering multiple logs (like a series), you may search and fetch for each one as needed.",
