@@ -65,7 +65,7 @@ export async function POST(request: Request) {
       totalMs: 30_000,
       firstChunkMs: 15_000,
     },
-    maxRetries:3
+    maxRetries: 3,
   });
 
   return createUIMessageStreamResponse({
@@ -74,10 +74,7 @@ export async function POST(request: Request) {
       sendReasoning: false,
       onError: (error) => {
         console.error("[chat] Stream error:", error);
-        if (
-          error instanceof Error &&
-          error.name === "TimeoutError"
-        ) {
+        if (error instanceof Error && error.name === "TimeoutError") {
           return "The AI model took too long to respond. Please try again.";
         }
         return "Something went wrong. Please try again.";
